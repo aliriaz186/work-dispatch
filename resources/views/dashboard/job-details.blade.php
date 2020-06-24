@@ -98,37 +98,6 @@
                         <div class="kt-portlet__head kt-portlet__head--lg">
                             <div class="kt-portlet__head-label">
                                 <h3 class="kt-portlet__head-title text-uppercase">
-                                    Technician
-                                </h3>
-                            </div>
-                        </div>
-                        <div class="kt-portlet__body">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <p> {{$technician->name}} </p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <p> {{$technician->email}} </p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <p> {{$technician->phone}} </p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <p> {{$technician->address}} </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kt-portlet kt-portlet--mobile">
-                        <div class="kt-portlet__head kt-portlet__head--lg">
-                            <div class="kt-portlet__head-label">
-                                <h3 class="kt-portlet__head-title text-uppercase">
                                     Attachments
                                 </h3>
                             </div>
@@ -207,7 +176,7 @@
             let map, infoWindow, geocoder;
             function initMap() {
                 map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 10,
+                    zoom: 15,
                     center: {lat: lati, lng: longi}
                 });
                 geocoder = new google.maps.Geocoder;

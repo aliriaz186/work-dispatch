@@ -43,4 +43,10 @@ Route::post('customer/update', 'CustomerController@update');
 Route::get('jobs/{id}/details', 'JobsController@getJobDetails');
 Route::get('technicians/{id}/details', 'TechnicianController@getTechnicianDetails');
 Route::get('technicians/{id}/jobs/new', 'TechnicianController@addNewJob');
+Route::get('workers', 'WorkerController@getWorkerView');
+Route::post('workers/all', 'WorkerController@getAll');
+Route::get('worker/new', 'WorkerController@newWorker');
+Route::post('workers/save', 'WorkerController@saveWorker');
+Route::get('workers/manage/{id}', 'WorkerController@editWorker');
+Route::post('workers/update', 'WorkerController@updateWorker');
 

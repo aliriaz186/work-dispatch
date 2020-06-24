@@ -9,85 +9,70 @@
         <form action="#" method="POST" id="listing_form" class="form-horizontal listing_form">
             {{ csrf_field() }}
             <div class="row">
-                <div class="col-xl-4 order-lg-4 order-xl-4">
+                <div class="col-xl-12 order-lg-12 order-xl-12">
                     <div class="kt-portlet kt-portlet--mobile">
                         <div class="kt-portlet__head kt-portlet__head--lg">
                             <div class="kt-portlet__head-label">
                             <span class="kt-portlet__head-icon">
-                                <i class="kt-font-brand fas fa-briefcase"></i>
+                                <i class="kt-font-brand fas fa-user"></i>
                             </span>
                                 <h3 class="kt-portlet__head-title">
-                                    Jobs
-                                </h3>
-                            </div>
-                        </div>
-                    </div>
-                    @foreach($jobs as $job)
-                        <div onclick="window.location.href = '{{env('APP_URL')}}/jobs/{{$job->id}}/details'" class="kt-portlet kt-portlet--mobile"  style="cursor: pointer;{{$job->status == 'offered' ? 'border-left: 5px solid greenyellow' : ''}} {{$job->status == 'completed' ? 'border-left: 5px solid #5d78ff' : ''}} {{$job->status == 'scheduled' ? 'border-left: 5px solid greenyellow' : ''}} {{$job->status == 'started' ? 'border-left: 5px solid greenyellow' : ''}}">
-                            <div class="kt-portlet__foot">
-                                <div class="kt-form__actions">
-                                    <div>
-                                        <h4 style="color: #5d78ff">{{$job->title}}</h4>
-                                        <p>{{$job->status}}</p>
-                                        <p>{{$job->customer->name}} ({{$job->customer->phone}})</p>
-                                        <p>{{$job->job_address}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="col-xl-8 order-lg-8 order-xl-8">
-                    <div class="kt-portlet kt-portlet--mobile">
-                        <div class="kt-portlet__head kt-portlet__head--lg">
-                            <div class="kt-portlet__head-label">
-                            <span class="kt-portlet__head-icon">
-                                <i class="kt-font-brand fas fa-map"></i>
-                            </span>
-                                <h3 class="kt-portlet__head-title">
-                                    Service Area
+                                    New Worker
                                 </h3>
                             </div>
                         </div>
                         <div class="kt-portlet__body">
-                            <div id="map" style="height:825px !important;width:100%;"></div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label class="">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" id="name" class="form-control"
+                                           placeholder="Enter full name" value="{{$worker->name}}">
+                                    <input type="hidden" name="id" id="id" value="{{$worker->id}}">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label>Email <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fa fa-envelope"></i></span></div>
+                                        <input type="text" name="email" id="email"
+                                               class="form-control"
+                                               placeholder="Enter email" value="{{$worker->email}}">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label>Phone <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fa fa-phone"></i></span></div>
+                                        <input type="text" name="phone" id="phone"
+                                               class="form-control"
+                                               placeholder="" value="{{$worker->phone}}">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <img src="{{asset('img/technician.png')}}" style="display: none" id="technician-icon">
-            </div>
-            <p id="long">{{$technician->longg}}</p>
-            <p id="lat">{{$technician->lat}}</p>
-        </form>
-        <script>
-            function initMap() {
-                let marker = false; ////Has the user plotted their location marker?
-                let lati = parseFloat(document.getElementById('lat').innerText);
-                let longi =  parseFloat(document.getElementById('long').innerText);
-                let map, infoWindow, geocoder;
-                map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 10,
-                    center: {lat: lati, lng: longi}
-                });
-                geocoder = new google.maps.Geocoder;
-                infoWindow = new google.maps.InfoWindow;
-                let clickedLocation = {lat: lati, lng: longi};
-                if(marker === false){
-                    marker = new google.maps.Marker({
-                        position: clickedLocation,
-                        map: map,
-                        title : "Technician Location"
-                    });
-                } else{
-                    marker.setPosition(clickedLocation);
-                }
 
-            }
-        </script>
-        <script async defer
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJqJcwaHOlWKivApYFYSjmVobGeKFqGdE&callback=initMap">
-        </script>
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__foot">
+                            <div class="kt-form__actions">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        |
+                                        <a href="{{env('APP_URL')}}/workers" class="btn btn-warning">Go Back</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
     </div>
+
+    <!-- end:: Content -->
     <script>
 
         $(document).ready(function () {
@@ -108,11 +93,6 @@
                 $(".listing_form").validate({
                     // Specify validation rules
                     rules: {
-                        address: {required: true},
-                        technician_name: {required: true},
-                        title: {required: true},
-                        description: {required: true},
-                        service_type: {required: true},
                         name: {required: true},
                         email: {email: true, required: true},
                         phone: {required: true, minlength: 10},
@@ -120,11 +100,6 @@
                     },
                     // Specify validation error messages
                     messages: {
-                        address: "Please enter address",
-                        technician_name: "Please select technician from map",
-                        title: "Please enter title",
-                        description: "Please enter description",
-                        service_type: "Please enter service type",
                         name: "Please enter name",
                         email: "Please enter email address",
                         phone: {
@@ -160,7 +135,7 @@
                         e.preventDefault();
                         e.stopImmediatePropagation();
                         $.ajax({
-                            url: "{{env('APP_URL')}}/job/save",
+                            url: "{{env('APP_URL')}}/workers/update",
                             type: 'POST',
                             dataType: "JSON",
                             data: data,
@@ -178,7 +153,7 @@
                                             "showConfirmButton": false,
                                             "timer": 1500,
                                             "onClose": function (e) {
-                                                window.location.href = `{{env('APP_URL')}}/jobs`
+                                                window.location.href = `{{env('APP_URL')}}/workers`
                                             }
                                         })
                                     }, 2000);
