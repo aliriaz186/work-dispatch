@@ -1,0 +1,64 @@
+.card-details {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5rem;
+    transition: color 0.3s ease;
+    color: #595d6e;
+}
+
+.card {
+    background-color: transparent!important;
+    border: 0px solid transparent!important;
+}
+
+.kt-widget.kt-widget--user-profile-3 .kt-widget__top .kt-widget__media img {
+    width: 150px !important;
+}
+
+.portlet-info {
+    margin-bottom: 0px !important;
+}
+
+.portlet-cars {
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.0) !important;
+}
+
+.portlet-cars .kt-portlet__body {
+    padding: 10px 25px 10px 25px !important;
+}
+
+.portlet-cars .kt-widget31 .kt-widget31__item .kt-widget31__content:last-child {
+    width: 100% !important;
+}
+
+.portlet-cars .kt-widget31 .kt-widget31__item .kt-widget31__content .kt-widget31__info {
+    padding: 0 10px !important;
+}
+
+.portlet-cars .kt-widget31 {
+    border-bottom: 1px solid #EEE !important;
+    padding: 10px 0px;
+}
+
+.kt-widget-dispatch-car {
+    border: 1px dashed #C6C6C6;
+    border-radius: 5px;
+    padding: 18px 10px;
+}
+
+.kt-widget-dispatch-car.kt-widget.kt-widget--user-profile-1 {
+    padding-bottom: 1.2rem;
+}
+
+.kt-widget-dispatch-car.kt-widget.kt-widget--user-profile-1 .kt-widget__body .kt-widget__content {
+    padding: 1.2rem 0 0rem 0 !important;
+}
+
+.form-control[readonly] {
+    background-color: #f7f8fa;
+}
+
+.form-control::placeholder {
+    color: #ccc;
+    opacity: 1;
+}
