@@ -49,4 +49,10 @@ Route::get('worker/new', 'WorkerController@newWorker');
 Route::post('workers/save', 'WorkerController@saveWorker');
 Route::get('workers/manage/{id}', 'WorkerController@editWorker');
 Route::post('workers/update', 'WorkerController@updateWorker');
+Route::post('job/accept', 'JobsController@acceptJob');
+Route::post('job/schedule', 'JobsController@scheduleJob');
+Route::get('job/{token}/worker/view', 'WorkerController@workerView');
+Route::post('job/on-my-way', 'WorkerController@onMyWay');
+Route::post('job/start', 'WorkerController@startJob');
+Route::post('job/complete', 'WorkerController@completeJob');
 

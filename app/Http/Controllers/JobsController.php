@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Customer;
 use App\DispatchJob;
 use App\Jobs\CustomerJobCreatedEmail;
+use App\Jobs\JobScheduledForCustomer;
+use App\Jobs\JobScheduledForTechnician;
+use App\ScheduledJob;
 use App\Technician;
+use App\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use services\email_services\EmailAddress;
@@ -23,6 +27,39 @@ class JobsController extends Controller
 
     public function newJobView(){
         return view('dashboard.new-job');
+    }
+
+    public function acceptJob(Request $request){
+        try {
+            $job = DispatchJob::where('id', $request->jobId)->first();
+            $job->status = 'unscheduled';
+            return json_encode(['status' => $job->update()]);
+        }catch (\Exception $exception){
+            return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
+        }
+    }
+
+    public function scheduleJob(Request $request){
+        try {
+            $scheduleJob = new ScheduledJob();
+            $scheduleJob->date = $request->date;
+            $scheduleJob->est_time_from = $request->estStart;
+            $scheduleJob->est_time_to = $request->estEnd;
+            $scheduleJob->id_worker = $request->selectedWorker;
+            $scheduleJob->id_job = $request->jobId;
+            $job = DispatchJob::where('id', $request->jobId)->first();
+            $job->status = 'scheduled';
+            $job->update();
+            $result = $scheduleJob->save();
+            $customerEmail = Customer::where('id', $job->id_customer)->first()['email'];
+            $workerEmail = Worker::where('id',  $request->selectedWorker)->first()['email'];
+            JobScheduledForCustomer::dispatch(new EmailAddress($customerEmail), $request->jobId, $scheduleJob->id);
+            JobScheduledForTechnician::dispatch(new EmailAddress($workerEmail), $request->jobId, $scheduleJob->id);
+            return json_encode(['status' => $result]);
+        }catch (\Exception $exception){
+            return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
+        }
+
     }
 
     public function saveJob(Request $request){
@@ -108,7 +145,14 @@ class JobsController extends Controller
         $job = DispatchJob::where('id', $jobId)->first();
         $customer = Customer::where('id', $job->id_customer)->first();
         $technician = Technician::where('id', $job->id_technician)->first();
-        return view('dashboard.job-details')->with(['job' => $job, 'customer' => $customer, 'technician' => $technician]);
+        $workers = Worker::where('id_technician', $job->id_technician)->get();
+        $schedule = ScheduledJob::where('id_job', $jobId)->first();
+        if (!empty($schedule)){
+            $workerName = Worker::where('id', $schedule->id_worker)->first()['name'];
+        }else{
+            $workerName = '';
+        }
+        return view('dashboard.job-details')->with(['job' => $job, 'customer' => $customer, 'technician' => $technician, 'workers' => $workers, 'schedule' => $schedule, 'workerName' => $workerName]);
     }
 
 }

@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Customer;
+use App\DispatchJob;
+use App\Jobs\TechnicianOnItsWayEmail;
+use App\ScheduledJob;
+use App\Technician;
 use App\Worker;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use services\email_services\EmailAddress;
 
 class WorkerController extends Controller
 {
@@ -111,5 +118,56 @@ class WorkerController extends Controller
         );
 
         echo json_encode($json_data);
+    }
+
+    public function workerView(string $token){
+        try {
+            $token = JWT::decode($token, 'dispatchEncodeSecret-2020', array('HS256'));
+            $jobId = $token->jobId;
+            $job = DispatchJob::where('id', $jobId)->first();
+            $customer = Customer::where('id', $job->id_customer)->first();
+            $technician = Technician::where('id', $job->id_technician)->first();
+            $schedule = ScheduledJob::where('id_job', $jobId)->first();
+            return view('worker.worker-view')->with(['job' => $job, 'customer' => $customer, 'technician' => $technician, 'schedule' => $schedule]);
+        }catch (\Exception $exception){
+            return json_encode("Access Denied.");
+        }
+
+    }
+
+    public function onMyWay(Request $request){
+        try {
+            $job = DispatchJob::where('id', $request->jobId)->first();
+            $job->status = 'On My Way';
+            $result = $job->update();
+            $customerEmail = Customer::where('id', $job->id_customer)->first()['email'];
+            $scheduleId = ScheduledJob::where('id_job', $request->jobId)->first()['id'];
+            TechnicianOnItsWayEmail::dispatch(new EmailAddress($customerEmail), $request->jobId, $scheduleId);
+            return json_encode(['status' => $result]);
+        } catch (\Exception $exception) {
+            return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
+        }
+    }
+
+    public function startJob(Request $request){
+        try {
+            $job = DispatchJob::where('id', $request->jobId)->first();
+            $job->status = 'Job Started';
+            $result = $job->update();
+            return json_encode(['status' => $result]);
+        } catch (\Exception $exception) {
+            return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
+        }
+    }
+
+    public function completeJob(Request $request){
+        try {
+            $job = DispatchJob::where('id', $request->jobId)->first();
+            $job->status = 'Completed';
+            $result = $job->update();
+            return json_encode(['status' => $result]);
+        } catch (\Exception $exception) {
+            return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
+        }
     }
 }
