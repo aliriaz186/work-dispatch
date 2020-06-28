@@ -55,4 +55,5 @@ Route::get('job/{token}/worker/view', 'WorkerController@workerView');
 Route::post('job/on-my-way', 'WorkerController@onMyWay');
 Route::post('job/start', 'WorkerController@startJob');
 Route::post('job/complete', 'WorkerController@completeJob');
+Route::get('job/{token}/track', 'CustomerController@trackJob');
 

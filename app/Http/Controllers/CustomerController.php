@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Customer;
 use App\DispatchJob;
+use App\ScheduledJob;
+use App\Technician;
+use App\Worker;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -75,6 +79,25 @@ class CustomerController extends Controller
             return json_encode(['status' =>  $customer->update()]);
         } catch (\Exception $exception) {
             return json_encode(['status' => false, 'message' => $exception->getMessage()]);
+        }
+    }
+
+    public function trackJob(string $token){
+        try {
+            $token = JWT::decode($token, 'dispatchEncodeSecret-2020', array('HS256'));
+            $jobId = $token->jobId;
+            $job = DispatchJob::where('id', $jobId)->first();
+            $customer = Customer::where('id', $job->id_customer)->first();
+            $technician = Technician::where('id', $job->id_technician)->first();
+            $schedule = ScheduledJob::where('id_job', $jobId)->first();
+            if (!empty($schedule)){
+                $worker = Worker::where('id', $schedule->id_worker)->first();
+            }else{
+                $worker ="";
+            }
+            return view('customer.customer-view')->with(['job' => $job, 'customer' => $customer, 'technician' => $technician, 'schedule' => $schedule, "worker" => $worker]);
+        }catch (\Exception $exception){
+            return json_encode("Access Denied.");
         }
     }
 }

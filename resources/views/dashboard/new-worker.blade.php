@@ -17,7 +17,7 @@
                                 <i class="kt-font-brand fas fa-user"></i>
                             </span>
                                 <h3 class="kt-portlet__head-title">
-                                    New Worker
+                                    New Technician
                                 </h3>
                             </div>
                         </div>

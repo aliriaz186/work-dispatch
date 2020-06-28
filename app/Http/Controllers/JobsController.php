@@ -10,6 +10,7 @@ use App\Jobs\JobScheduledForTechnician;
 use App\ScheduledJob;
 use App\Technician;
 use App\Worker;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use services\email_services\EmailAddress;
@@ -18,7 +19,7 @@ class JobsController extends Controller
 {
     public function getView(){
         $technician = Technician::where('id', Session::get('userId'))->first();
-        $jobs = DispatchJob::where('id_technician', Session::get('userId'))->get();
+        $jobs = DispatchJob::where('id_technician', Session::get('userId'))->orderBy('created_at', 'DESC')->get();
         foreach ($jobs as $job){
             $job->customer = Customer::where('id', $job->id_customer)->first();
         }

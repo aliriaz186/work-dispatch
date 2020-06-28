@@ -15,7 +15,7 @@
 								<i class="kt-font-brand flaticon-users-1"></i>
 							</span>
                             <h3 class="kt-portlet__head-title">
-                                Workers
+                                Technicians
                             </h3>
                         </div>
                         <div class="kt-portlet__head-toolbar">
@@ -68,7 +68,7 @@
                                     <a href="{{env('APP_URL')}}/worker/new"
                                        class="btn btn-brand btn-elevate btn-icon-sm">
                                         <i class="la la-plus"></i>
-                                        New Worker
+                                        New Technician
                                     </a>
                                 </div>
                             </div>
