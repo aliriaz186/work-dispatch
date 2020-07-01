@@ -13,7 +13,16 @@ use App\Worker;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use services\email_messages\JobScheduleForCustomerMessage;
+use services\email_messages\JobScheduleForTechnicanMessage;
 use services\email_services\EmailAddress;
+use services\email_services\EmailBody;
+use services\email_services\EmailMessage;
+use services\email_services\EmailSender;
+use services\email_services\EmailSubject;
+use services\email_services\MailConf;
+use services\email_services\PhpMail;
+use services\email_services\SendEmailService;
 
 class JobsController extends Controller
 {
@@ -54,8 +63,29 @@ class JobsController extends Controller
             $result = $scheduleJob->save();
             $customerEmail = Customer::where('id', $job->id_customer)->first()['email'];
             $workerEmail = Worker::where('id',  $request->selectedWorker)->first()['email'];
-            JobScheduledForCustomer::dispatch(new EmailAddress($customerEmail), $request->jobId, $scheduleJob->id);
-            JobScheduledForTechnician::dispatch(new EmailAddress($workerEmail), $request->jobId, $scheduleJob->id);
+//            JobScheduledForCustomer::dispatch(new EmailAddress($customerEmail), $request->jobId, $scheduleJob->id);
+//            JobScheduledForTechnician::dispatch(new EmailAddress($workerEmail), $request->jobId, $scheduleJob->id);
+            $subject = new SendEmailService(new EmailSubject("Hi, Your job has been Scheduled in "."   ". env('APP_NAME')));
+            $mailTo = new EmailAddress($customerEmail);
+            $this->schedulesId = $scheduleJob->id;
+            $this->jobId = JWT::encode(['jobId' => $request->jobId], 'dispatchEncodeSecret-2020');
+            $invitationMessage = new JobScheduleForCustomerMessage();
+            $emailBody = $invitationMessage->message($this->jobId, $this->schedulesId);
+            $body = new EmailBody($emailBody);
+            $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
+            $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
+            $result = $sendEmail->send($emailMessage);
+
+            $subject = new SendEmailService(new EmailSubject("Hi, A job assigned to you in "."   ". env('APP_NAME')));
+            $mailTo = new EmailAddress($workerEmail);
+            $this->schedulesId = $scheduleJob->id;
+            $this->jobId = JWT::encode(['jobId' => $request->jobId], 'dispatchEncodeSecret-2020');
+            $invitationMessage = new JobScheduleForTechnicanMessage();
+            $emailBody = $invitationMessage->message($this->jobId, $this->schedulesId);
+            $body = new EmailBody($emailBody);
+            $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
+            $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
+            $result = $sendEmail->send($emailMessage);
             return json_encode(['status' => $result]);
         }catch (\Exception $exception){
             return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);

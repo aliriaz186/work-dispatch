@@ -11,7 +11,15 @@ use App\Worker;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use services\email_messages\TechnicianOnItsWayMessage;
 use services\email_services\EmailAddress;
+use services\email_services\EmailBody;
+use services\email_services\EmailMessage;
+use services\email_services\EmailSender;
+use services\email_services\EmailSubject;
+use services\email_services\MailConf;
+use services\email_services\PhpMail;
+use services\email_services\SendEmailService;
 
 class WorkerController extends Controller
 {
@@ -142,7 +150,17 @@ class WorkerController extends Controller
             $result = $job->update();
             $customerEmail = Customer::where('id', $job->id_customer)->first()['email'];
             $scheduleId = ScheduledJob::where('id_job', $request->jobId)->first()['id'];
-            TechnicianOnItsWayEmail::dispatch(new EmailAddress($customerEmail), $request->jobId, $scheduleId);
+//            TechnicianOnItsWayEmail::dispatch(new EmailAddress($customerEmail), $request->jobId, $scheduleId);
+            $subject = new SendEmailService(new EmailSubject("Technician is on his way to your location!"));
+            $mailTo = new EmailAddress($customerEmail);
+            $this->schedulesId = $scheduleId;
+            $this->jobId = JWT::encode(['jobId' => $request->jobId], 'dispatchEncodeSecret-2020');
+            $invitationMessage = new TechnicianOnItsWayMessage();
+            $emailBody = $invitationMessage->message($this->jobId, $this->schedulesId);
+            $body = new EmailBody($emailBody);
+            $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
+            $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
+            $result = $sendEmail->send($emailMessage);
             return json_encode(['status' => $result]);
         } catch (\Exception $exception) {
             return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
