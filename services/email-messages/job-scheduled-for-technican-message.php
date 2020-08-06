@@ -34,4 +34,11 @@ class JobScheduleForTechnicanMessage
         return $emailBody;
     }
 
+    public function textMessage(string $jobId, string $scheduledId){
+        $scheduled = ScheduledJob::where('id', $scheduledId)->first();
+        $worker = Worker::where('id', $scheduled->id_worker)->first();
+        $emailBody = "A job has been assigned to you.\n" . "A job  has been assigned on ".$scheduled->date ." between (".$scheduled->est_time_from ." - ".$scheduled->est_time_to .")\n Click on link to view job\n " . env('APP_URL'). "/job/".$jobId."/worker/view";
+        return $emailBody;
+    }
+
 }

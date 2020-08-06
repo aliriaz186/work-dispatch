@@ -62,7 +62,9 @@ class JobsController extends Controller
             $job->update();
             $result = $scheduleJob->save();
             $customerEmail = Customer::where('id', $job->id_customer)->first()['email'];
+            $customerPhone = Customer::where('id', $job->id_customer)->first()['phone'];
             $workerEmail = Worker::where('id',  $request->selectedWorker)->first()['email'];
+            $workerPhone = Worker::where('id',  $request->selectedWorker)->first()['phone'];
 //            JobScheduledForCustomer::dispatch(new EmailAddress($customerEmail), $request->jobId, $scheduleJob->id);
 //            JobScheduledForTechnician::dispatch(new EmailAddress($workerEmail), $request->jobId, $scheduleJob->id);
             $subject = new SendEmailService(new EmailSubject("Hi, Your job has been Scheduled in "."   ". env('APP_NAME')));
@@ -71,10 +73,14 @@ class JobsController extends Controller
             $this->jobId = JWT::encode(['jobId' => $request->jobId], 'dispatchEncodeSecret-2020');
             $invitationMessage = new JobScheduleForCustomerMessage();
             $emailBody = $invitationMessage->message($this->jobId, $this->schedulesId);
+            $textEmailBody = $invitationMessage->textMessage($this->jobId, $this->schedulesId);
             $body = new EmailBody($emailBody);
             $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
             $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
             $result = $sendEmail->send($emailMessage);
+            $this->sendMessage($customerPhone, $textEmailBody);
+
+
 
             $subject = new SendEmailService(new EmailSubject("Hi, A job assigned to you in "."   ". env('APP_NAME')));
             $mailTo = new EmailAddress($workerEmail);
@@ -82,15 +88,25 @@ class JobsController extends Controller
             $this->jobId = JWT::encode(['jobId' => $request->jobId], 'dispatchEncodeSecret-2020');
             $invitationMessage = new JobScheduleForTechnicanMessage();
             $emailBody = $invitationMessage->message($this->jobId, $this->schedulesId);
+            $textEmailBody = $invitationMessage->textMessage($this->jobId, $this->schedulesId);
             $body = new EmailBody($emailBody);
             $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
             $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
             $result = $sendEmail->send($emailMessage);
+            $this->sendMessage($workerPhone, $textEmailBody);
             return json_encode(['status' => $result]);
         }catch (\Exception $exception){
             return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
         }
 
+    }
+
+    public function sendMessage($recipients, $message){
+        $account_sid = getenv("TWILIO_SID");
+        $auth_token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio_number = getenv("TWILIO_NUMBER");
+        $client = new \Twilio\Rest\Client($account_sid, $auth_token);
+        $client->messages->create($recipients, ['from' => $twilio_number, 'body' => $message]);
     }
 
     public function saveJob(Request $request){

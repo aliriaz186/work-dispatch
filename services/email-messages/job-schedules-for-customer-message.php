@@ -33,4 +33,11 @@ class JobScheduleForCustomerMessage
         return $emailBody;
     }
 
+    public function textMessage(string $jobId, string $scheduledId){
+        $scheduled = ScheduledJob::where('id', $scheduledId)->first();
+        $worker = Worker::where('id', $scheduled->id_worker)->first();
+        $emailBody = "Your job has been scheduled\n" . "Technician (".$worker->name .") will be at your location on ".$scheduled->date ." between (".$scheduled->est_time_from ." - ".$scheduled->est_time_to .")\nClick on link to track\n " . env('APP_URL')."/job/".$jobId."/track";
+        return $emailBody;
+    }
+
 }

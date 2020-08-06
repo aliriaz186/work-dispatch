@@ -32,6 +32,14 @@ class TechnicianController extends Controller
         return view('dashboard.technician-new-job')->with(['technician' => $technician]);
     }
 
+    public function sendMessage($recipients, $message){
+        $account_sid = getenv("TWILIO_SID");
+        $auth_token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio_number = getenv("TWILIO_NUMBER");
+        $client = new \Twilio\Rest\Client($account_sid, $auth_token);
+        $client->messages->create($recipients, ['from' => $twilio_number, 'body' => $message]);
+    }
+
     public function saveTechnician(Request $request){
         try {
             $technician= new Technician();

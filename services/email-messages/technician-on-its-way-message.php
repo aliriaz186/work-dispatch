@@ -33,4 +33,11 @@ class TechnicianOnItsWayMessage
         return $emailBody;
     }
 
+    public function textMessage(string $jobId, string $scheduledId){
+        $scheduled = ScheduledJob::where('id', $scheduledId)->first();
+        $worker = Worker::where('id', $scheduled->id_worker)->first();
+        $emailBody = "Technician is on its way to your location.\n" . "Technician (".$worker->name .") will be at your location shortly.\n Click on link to track job\n " . env('APP_URL'). "/job/".$jobId."/track";
+        return $emailBody;
+    }
+
 }
