@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Customer;
 use App\DispatchJob;
+use App\JobCompleteStatus;
+use App\JobImages;
+use App\JobRating;
 use App\Jobs\TechnicianOnItsWayEmail;
 use App\ScheduledJob;
 use App\Technician;
 use App\Worker;
+use App\WorkerWorkType;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -47,6 +51,13 @@ class WorkerController extends Controller
             $worker->phone = $request->phone;
             $worker->id_technician = Session::get('userId');
             $result = $worker->save();
+            $arrayWorkType = explode(',', $request->checkBoxesArray);
+            for ($i = 0; $i < count($arrayWorkType); $i++) {
+                $workerWorkType = new WorkerWorkType();
+                $workerWorkType->technician_id = $worker->id;
+                $workerWorkType->type = $arrayWorkType[$i];
+                $workerWorkType->save();
+            }
             return json_encode(['status' => $result]);
         } catch (\Exception $exception) {
                 return json_encode(['status' => false, 'message' => $exception->getMessage()]);
@@ -136,7 +147,9 @@ class WorkerController extends Controller
             $customer = Customer::where('id', $job->id_customer)->first();
             $technician = Technician::where('id', $job->id_technician)->first();
             $schedule = ScheduledJob::where('id_job', $jobId)->first();
-            return view('worker.worker-view')->with(['job' => $job, 'customer' => $customer, 'technician' => $technician, 'schedule' => $schedule]);
+            $jobImages = JobImages::where('job_id', $jobId)->get();
+            $ratings = JobRating::where('jobId', $jobId)->first();
+            return view('worker.worker-view')->with(['ratings' => $ratings,'jobImages' => $jobImages,'job' => $job, 'customer' => $customer, 'technician' => $technician, 'schedule' => $schedule]);
         }catch (\Exception $exception){
             return json_encode("Access Denied.");
         }
@@ -163,7 +176,7 @@ class WorkerController extends Controller
             $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
             $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
             $result = $sendEmail->send($emailMessage);
-            $this->sendMessage($customerphone, $textEmailBody);
+//            $this->sendMessage($customerphone, $textEmailBody);
             return json_encode(['status' => $result]);
         } catch (\Exception $exception) {
             return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
@@ -191,6 +204,11 @@ class WorkerController extends Controller
 
     public function completeJob(Request $request){
         try {
+            $jobCompleteStatus = new JobCompleteStatus();
+            $jobCompleteStatus->job_id = $request->jobId;
+            $jobCompleteStatus->conclusion = $request->conclusion;
+            $jobCompleteStatus->completion_status = $request->issueRepaired;
+            $jobCompleteStatus->save();
             $job = DispatchJob::where('id', $request->jobId)->first();
             $job->status = 'Completed';
             $result = $job->update();

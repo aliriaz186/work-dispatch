@@ -85,6 +85,32 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row mt-4">
+                                <div class="col-lg-12">
+                                    <label>Type of work <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="row col-lg-12 mt-1">
+                                            <input id="plumbing-work" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Plumbing</span>
+                                            <input id="electrician-work" style="margin-left: 129px" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Electrician</span>
+                                            <input id="hvac-work" style="margin-left: 139px" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Hvac</span>
+                                        </div>
+                                        <div class="row col-lg-12 mt-1">
+                                            <input id="garage-doors-work" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Garage Doors</span>
+                                            <input id="appliances-work" style="margin-left: 100px" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Appliances</span>
+                                            <input id="drywall-work" style="margin-left: 133px" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Drywall</span>
+                                        </div>
+                                        <div class="row col-lg-12 mt-1">
+                                            <input id="roof-repair-work" style="" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Roof Repair</span>
+                                            <input id="septic-system-work" style="margin-left: 117px" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Septic System</span>
+                                            <input id="pools-work" style="margin-left: 114px" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Pools</span>
+                                        </div>
+                                        <div class="row col-lg-12 mt-1">
+                                            <input id="central-vacuum-work" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">Central Vacuum</span>
+                                            <input id="other-work" style="margin-left: 85px" type="checkbox"><span style="margin-top: -3px;margin-left: 6px;">other</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -256,7 +282,7 @@
 
     <!-- end:: Content -->
     <script>
-
+        let checkBoxesArray = [];
         $(document).ready(function () {
             KTApp.blockPage({
                 baseZ: 2000,
@@ -301,12 +327,70 @@
                             "type": "error",
                             "confirmButtonClass": "btn btn-secondary",
                             "onClose": function (e) {
-                                console.log('on close event fired!');
+                                checkBoxesArray = [];
                             }
                         })
                     },
                     // Here we submit the completed form to database
                     submitHandler: function (form, e) {
+                        if (document.getElementById('other-work').checked === false && document.getElementById('central-vacuum-work').checked === false && document.getElementById('pools-work').checked === false && document.getElementById('septic-system-work').checked === false && document.getElementById('roof-repair-work').checked === false && document.getElementById('drywall-work').checked === false && document.getElementById('appliances-work').checked === false && document.getElementById('garage-doors-work').checked === false && document.getElementById('hvac-work').checked === false && document.getElementById('electrician-work').checked === false && document.getElementById('plumbing-work').checked === false) {
+                            swal.fire({
+                                "title": "",
+                                "text": "Please select atleast one work type",
+                                "type": "error",
+                                "confirmButtonClass": "btn btn-secondary",
+                                "onClose": function (e) {
+                                    console.log('on close event fired!');
+                                }
+                            })
+                            event.preventDefault();
+                            return;
+                        }
+                        if(document.getElementById('plumbing-work').checked === true)
+                        {
+                            checkBoxesArray.push('Plumbing');
+                        }
+                        if(document.getElementById('electrician-work').checked === true)
+                        {
+                            checkBoxesArray.push('Electrician');
+                        }
+                        if(document.getElementById('hvac-work').checked === true)
+                        {
+                            checkBoxesArray.push('Hvac');
+                        }
+                        if(document.getElementById('garage-doors-work').checked === true)
+                        {
+                            checkBoxesArray.push('Garage Doors');
+                        }
+                        if(document.getElementById('appliances-work').checked === true)
+                        {
+                            checkBoxesArray.push('Appliances');
+                        }
+                        if(document.getElementById('drywall-work').checked === true)
+                        {
+                            checkBoxesArray.push('Drywall');
+                        }
+                        if(document.getElementById('roof-repair-work').checked === true)
+                        {
+                            checkBoxesArray.push('Roof Repair');
+                        }
+                        if(document.getElementById('septic-system-work').checked === true)
+                        {
+                            checkBoxesArray.push('Septic System');
+                        }
+                        if(document.getElementById('pools-work').checked === true)
+                        {
+                            checkBoxesArray.push('Pools');
+                        }
+                        if(document.getElementById('central-vacuum-work').checked === true)
+                        {
+                            checkBoxesArray.push('Central Vacuum');
+                        }
+                        if(document.getElementById('other-work').checked === true)
+                        {
+                            checkBoxesArray.push('Other');
+                        }
+
                         // Enable Page Loading
                         KTApp.blockPage({
                             baseZ: 2000,
@@ -318,6 +402,10 @@
                         });
                         var form = $('.listing_form');
                         var data = form.serializeArray();
+                        data.push({
+                            "name": "checkBoxesArray",
+                            "value": checkBoxesArray
+                        });
                         e.preventDefault();
                         e.stopImmediatePropagation();
                         $.ajax({

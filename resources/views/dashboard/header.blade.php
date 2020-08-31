@@ -78,13 +78,13 @@
         <!-- Uncomment this to display the close button of the panel
 <button class="kt-aside-close " id="kt_aside_close_btn"><i class="la la-close"></i></button>
 -->
-        <div class="kt-aside  kt-aside--fixed  kt-grid__item kt-grid kt-grid--desktop kt-grid--hor-desktop"
+        <div style="background-color: #F58134!important;" class="kt-aside  kt-aside--fixed  kt-grid__item kt-grid kt-grid--desktop kt-grid--hor-desktop"
              id="kt_aside">
             <!-- begin:: Aside -->
-            <div class="kt-aside__brand kt-grid__item " id="kt_aside_brand">
+            <div class="kt-aside__brand kt-grid__item " id="kt_aside_brand" style="background-color: rgb(255, 156, 79) !important;">
                 <div class="kt-aside__brand-logo">
                     <a href="#">
-                        <h3 style="color: white!important;">Dispatch</h3>
+                        <h3 style="color: white!important;font-size: 18px;">Priority Home Warranty</h3>
 {{--                        <img alt="Logo" src="{{asset('media/logos/logo-light.png')}}"/>--}}
                     </a>
                 </div>
@@ -107,7 +107,7 @@
                         <li class="kt-menu__item {{ (Request::segment(1) == 'jobs') ? 'kt-menu__item--active' : '' }}"
                             aria-haspopup="true"><a href="{{env('APP_URL')}}/jobs" class="kt-menu__link "><span
                                     class="kt-menu__link-icon"><i class="fas fa-briefcase"></i></span><span
-                                    class="kt-menu__link-text">Jobs</span></a></li>
+                                    class="kt-menu__link-text">Claims</span></a></li>
                         <li class="kt-menu__item {{ (Request::segment(1) == 'workers') ? 'kt-menu__item--active' : '' }}"
                             aria-haspopup="true"><a href="{{env('APP_URL')}}/workers" class="kt-menu__link "><span
                                     class="kt-menu__link-icon"><i class="fas fa-users"></i></span><span

@@ -50,7 +50,7 @@
 
             <!--begin::Aside-->
             <div class="kt-grid__item kt-grid__item--order-tablet-and-mobile-2 kt-grid kt-grid--hor kt-login__aside"
-                 style="background-color: #1e1e2d">
+                 style="background-color: #F58134">
                 <div class="kt-grid__item">
                     <a href="#" class="kt-login__logo">
 {{--                    <img src="{{asset('media/logos/logo-4.png')}}">--}}
@@ -58,7 +58,7 @@
                 </div>
                 <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
                     <div class="kt-grid__item kt-grid__item--middle">
-                        <h3 class="kt-login__title">Dispatch Technician!</h3>
+                        <h3 class="kt-login__title">Priority Home Warranty Technician!</h3>
                         <h4 class="kt-login__subtitle">The ultimate Service providing platform.</h4>
                     </div>
                 </div>
@@ -114,11 +114,11 @@
                             </div>
                             <!--begin::Action-->
                             <div class="kt-login__actions">
-{{--                                <a href="#" class="kt-link kt-login__link-forgot">--}}
-{{--                                    Forgot Password ?--}}
-{{--                                </a>--}}
+                                <a class="kt-link kt-login__link-forgot" data-toggle="modal" data-target="#exampleModal">
+                                    Forgot Password ?
+                                </a>
                                 <button onclick="login()" id="kt_login_signin_submit"
-                                        class="btn btn-primary btn-elevate kt-login__btn-primary">Sign In
+                                        class="btn btn-brand btn-elevate kt-login__btn-primary">Sign In
                                 </button>
                             </div>
 
@@ -164,6 +164,24 @@
             </div>
 
             <!--end::Content-->
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Forgot Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close-button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="forgot-email" placeholder="Please enter your email">
+                <div>
+                    <button id="send-email-btn" class="btn btn-success" style="background-color: #0780b7!important;border-color: #0780b7;color: white;margin-top: 15px;border: none!important;" onclick="sendMessage()">Send Email</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -217,6 +235,56 @@
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 
 <script>
+
+    function sendMessage() {
+        var email = document.getElementById('forgot-email').value;
+        if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Invalid Email!',
+            });
+            return false;
+        }
+        let formData = new FormData();
+        formData.append("email", email);
+        formData.append("_token", "{{ csrf_token() }}");
+        document.getElementById('send-email-btn').setAttribute('disabled', true);
+        $.ajax
+        ({
+            type: 'POST',
+            url: `{{env('APP_URL')}}/forgot-password-request`,
+            data: formData,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function (data) {
+                document.getElementById('send-email-btn').removeAttribute('disabled');
+                document.getElementById('forgot-email').value = '';
+                data = JSON.parse(data);
+                if(data.status === true){
+                    swal.fire({
+                        "title": "",
+                        "text": "Email sent to your inbox. Please check!",
+                        "type": "success",
+                        "showConfirmButton": true,
+                        "onClose": function (e) {
+                            document.getElementById('close-button').click();
+                        }
+                    })
+                }else{
+                    alert(data.message);
+                }
+            },
+            error: function (data) {
+                document.getElementById('send-email-btn').removeAttribute('disabled');
+                alert(data.message);
+                console.log("data", data);
+            }
+        });
+
+    }
+
     function login() {
         document.getElementById('loginError').style.display = 'none';
         let email = document.getElementById('user_username').value;

@@ -120,7 +120,7 @@
                             <div class="kt-form__actions">
                                 <div class="row">
                                     <div class="col-lg-6">
-                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        <button type="submit" class="btn btn-brand" style="">Save Changes</button>
                                     </div>
                                 </div>
                             </div>

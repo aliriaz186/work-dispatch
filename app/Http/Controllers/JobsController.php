@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\ClaimFollowUp;
+use App\ClaimReschedule;
 use App\Customer;
 use App\DispatchJob;
+use App\JobImages;
+use App\JobRating;
 use App\Jobs\CustomerJobCreatedEmail;
 use App\Jobs\JobScheduledForCustomer;
 use App\Jobs\JobScheduledForTechnician;
@@ -49,6 +53,16 @@ class JobsController extends Controller
         }
     }
 
+    public function rejectJob(Request $request){
+        try {
+            $job = DispatchJob::where('id', $request->jobId)->first();
+            $job->status = 'rejected';
+            return json_encode(['status' => $job->update()]);
+        }catch (\Exception $exception){
+            return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
+        }
+    }
+
     public function scheduleJob(Request $request){
         try {
             $scheduleJob = new ScheduledJob();
@@ -67,7 +81,7 @@ class JobsController extends Controller
             $workerPhone = Worker::where('id',  $request->selectedWorker)->first()['phone'];
 //            JobScheduledForCustomer::dispatch(new EmailAddress($customerEmail), $request->jobId, $scheduleJob->id);
 //            JobScheduledForTechnician::dispatch(new EmailAddress($workerEmail), $request->jobId, $scheduleJob->id);
-            $subject = new SendEmailService(new EmailSubject("Hi, Your job has been Scheduled in "."   ". env('APP_NAME')));
+            $subject = new SendEmailService(new EmailSubject("Hi, Your claim has been Scheduled in "."   ". env('APP_NAME')));
             $mailTo = new EmailAddress($customerEmail);
             $this->schedulesId = $scheduleJob->id;
             $this->jobId = JWT::encode(['jobId' => $request->jobId], 'dispatchEncodeSecret-2020');
@@ -78,11 +92,11 @@ class JobsController extends Controller
             $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
             $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
             $result = $sendEmail->send($emailMessage);
-            $this->sendMessage($customerPhone, $textEmailBody);
+//            $this->sendMessage($customerPhone, $textEmailBody);
 
 
 
-            $subject = new SendEmailService(new EmailSubject("Hi, A job assigned to you in "."   ". env('APP_NAME')));
+            $subject = new SendEmailService(new EmailSubject("Hi, A claim assigned to you in "."   ". env('APP_NAME')));
             $mailTo = new EmailAddress($workerEmail);
             $this->schedulesId = $scheduleJob->id;
             $this->jobId = JWT::encode(['jobId' => $request->jobId], 'dispatchEncodeSecret-2020');
@@ -93,10 +107,10 @@ class JobsController extends Controller
             $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
             $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
             $result = $sendEmail->send($emailMessage);
-            $this->sendMessage($workerPhone, $textEmailBody);
+//            $this->sendMessage($workerPhone, $textEmailBody);
             return json_encode(['status' => $result]);
         }catch (\Exception $exception){
-            return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);
+            return json_encode(['status' => false, 'message' => $exception->getMessage()]);
         }
 
     }
@@ -199,7 +213,45 @@ class JobsController extends Controller
         }else{
             $workerName = '';
         }
-        return view('dashboard.job-details')->with(['job' => $job, 'customer' => $customer, 'technician' => $technician, 'workers' => $workers, 'schedule' => $schedule, 'workerName' => $workerName]);
+        $jobImages = JobImages::where('job_id', $jobId)->get();
+        $ratings = JobRating::where('jobId', $jobId)->first();
+        return view('dashboard.job-details')->with(['ratings' => $ratings,'jobImages' => $jobImages,'job' => $job, 'customer' => $customer, 'technician' => $technician, 'workers' => $workers, 'schedule' => $schedule, 'workerName' => $workerName]);
+    }
+
+    public function followUpReasonStore(Request $request){
+        $claimFollowUp = new ClaimFollowUp();
+        $claimFollowUp->job_id = $request->jobId;
+        $claimFollowUp->reason = $request->reason;
+        $claimFollowUp->save();
+        $dispatchJob = DispatchJob::where('id', $request->jobId)->first();
+        $dispatchJob->status = 'Follow Up';
+        $dispatchJob->update();
+        return redirect()->back();
+    }
+
+    public function rescheduleClaim(Request $request){
+        $claimReschedule = new ClaimReschedule();
+        $claimReschedule->job_id = $request->jobId;
+        $claimReschedule->reason = $request->reason;
+        $claimReschedule->save();
+        $dispatchJob = DispatchJob::where('id', $request->jobId)->first();
+        $dispatchJob->status = 'scheduled';
+        $dispatchJob->update();
+        $scheduledJob = ScheduledJob::where('id_job', $request->jobId)->first();
+        $scheduledJob->date = $request->sDate;
+        $scheduledJob->update();
+        return redirect()->back();
+    }
+
+    public function giveRating(Request $request){
+        $jobRating = new JobRating();
+        $jobRating->jobId = $request->jobId;
+        $jobRating->workerId = $request->workerId;
+        $jobRating->technicianId = $request->technicianId;
+        $jobRating->rating = $request->rate;
+        $jobRating->additional_comments = $request->additionalComments;
+        $jobRating->save();
+        return redirect()->back();
     }
 
 }

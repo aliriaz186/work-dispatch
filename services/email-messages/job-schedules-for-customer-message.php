@@ -13,7 +13,7 @@ class JobScheduleForCustomerMessage
         $worker = Worker::where('id', $scheduled->id_worker)->first();
         $emailBody = '
    <body>
-             <div style="margin-left: 50px;font-size: 25px;padding-top: 40px">Your job has been scheduled</div><br>
+             <div style="margin-left: 50px;font-size: 25px;padding-top: 40px">Your claim has been scheduled</div><br>
              <div style="margin-left: 50px;font-size: 25px;padding-top: 40px">Technician ('.$worker->name .') will be at your location on '.$scheduled->date .' between ('.$scheduled->est_time_from .' - '.$scheduled->est_time_to .')</div><br>
 
  <div style="padding-top: 30px;padding-bottom: 40px">
@@ -36,7 +36,7 @@ class JobScheduleForCustomerMessage
     public function textMessage(string $jobId, string $scheduledId){
         $scheduled = ScheduledJob::where('id', $scheduledId)->first();
         $worker = Worker::where('id', $scheduled->id_worker)->first();
-        $emailBody = "Your job has been scheduled\n" . "Technician (".$worker->name .") will be at your location on ".$scheduled->date ." between (".$scheduled->est_time_from ." - ".$scheduled->est_time_to .")\nClick on link to track\n " . env('APP_URL')."/job/".$jobId."/track";
+        $emailBody = "Your claim has been scheduled\n" . "Technician (".$worker->name .") will be at your location on ".$scheduled->date ." between (".$scheduled->est_time_from ." - ".$scheduled->est_time_to .")\nClick on link to track\n " . env('APP_URL')."/job/".$jobId."/track";
         return $emailBody;
     }
 

@@ -28,7 +28,7 @@
                         <div class="kt-portlet__head kt-portlet__head--lg">
                             <div class="kt-portlet__head-label">
                                 <h3 class="kt-portlet__head-title text-uppercase">
-                                    Job Status
+                                    Claim Status
                                 </h3>
                             </div>
                         </div>
@@ -39,23 +39,189 @@
                                         <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">{{$job->status}}</p>
                                         <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})</p>
                                     <p>Change status</p>
-                                        <button class="btn btn-primary" onclick="onMyWay()">On my Way</button>
+                                        <button class="btn btn-brand" onclick="onMyWay()">On my Way</button>
                                     @endif
                                         @if($job->status == 'On My Way')
                                             <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">You are on your way!</p>
                                             <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}}
                                                 - {{$schedule->est_time_to}})</p>
                                             <p>Change status</p>
-                                            <button class="btn btn-primary" onclick="startJob()">Start Job</button>
+                                            <button class="btn btn-brand" onclick="startJob()">Start Claim</button>
                                         @endif
                                         @if($job->status == 'Job Started')
-                                            <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Job Started!</p>
+                                            <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Claim Started!</p>
                                             <p>Change status</p>
-                                            <button class="btn btn-primary" onclick="completeJob()">Complete Job</button>
+                                            <button class="btn btn-brand" data-toggle="modal" data-target="#modalContactForm3">Complete Claim</button>
+                                            <button class="btn btn-primary" style="background-color: #0780b7;border-color: #0780b7;color: white;" data-toggle="modal" data-target="#modalContactForm">Needs Follow Up</button>
+                                            <button class="btn btn-primary" style="background-color: #0780b7;border-color: #0780b7;color: white;" data-toggle="modal" data-target="#modalContactForm2">Need Reschedule</button>
+                                        @endif
+                                        @if($job->status == 'Follow Up')
+                                            <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Follow Up</p>
+                                        @endif
+                                        @if($job->status == 'Denied')
+                                            <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Denied</p>
                                         @endif
                                         @if($job->status == 'Completed')
-                                            <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Job Completed!</p>
+                                            <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Claim Completed!</p>
                                         @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @if($job->status == 'Completed')
+                        <div class="kt-portlet kt-portlet--mobile">
+                            <div class="kt-portlet__head kt-portlet__head--lg">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title text-uppercase">
+                                        Reviews
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="kt-portlet__body">
+                                <div class="row">
+                                    @if(!empty($ratings->rating))
+                                        <div class="col-lg-12">
+                                            <p><span
+                                                    style="font-weight: 500">Rating:</span> {{$ratings->rating}} out of 5
+                                            </p>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <p><span
+                                                    style="font-weight: 500">Additional Comments:</span> {{$ratings->additional_comments}}
+                                            </p>
+                                        </div>
+                                    @else
+                                        <div class="col-lg-12">
+                                            <p>No reviews yet!</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                @endif
+
+                    <!-- Model -->
+                    <div class="modal fade" id="modalContactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header text-center">
+                                    <h4 class="modal-title w-100 font-weight-bold">Needs Follow Up</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form method="post" action="{{url("/followup/reason")}}" enctype="multipart/form-data">
+                                    {{csrf_field()}}
+                                    <input type="hidden" id="jobId" name="jobId" value="{{$job->id}}">
+                                    <div class="modal-body mx-3">
+                                        <div class="md-form">
+                                            <i class="fas fa-pencil prefix grey-text"></i>
+                                            <label data-error="wrong" data-success="right" for="form8">Your
+                                                Reason:</label>
+                                            <textarea type="text" id="reason" name="reason"
+                                                      class="md-textarea form-control" rows="4" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer d-flex justify-content-center">
+                                        <button class="btn btn-brand">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model -->
+                    <div class="modal fade" id="modalContactForm2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header text-center">
+                                    <h4 class="modal-title w-100 font-weight-bold">Reschedule Claim</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form method="post" action="{{url("/reschedule/claim")}}" enctype="multipart/form-data">
+                                    {{csrf_field()}}
+                                    <input type="hidden" id="jobId" name="jobId" value="{{$job->id}}">
+                                    <div class="modal-body mx-3">
+                                        <div class="md-form">
+                                            <i class="fas fa-pencil prefix grey-text"></i>
+                                            <label data-error="wrong" data-success="right" for="form8">Your
+                                                Reason:</label>
+                                            <textarea type="text" id="reason" name="reason"
+                                                      class="md-textarea form-control" rows="4" required></textarea>
+                                        </div>
+                                        <div class="md-form">
+                                            <i class="fas fa-pencil prefix grey-text"></i>
+                                            <p>Reschedule Date</p>
+                                            <input type="date" id="sDate" name="sDate" placeholder="Select date" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer d-flex justify-content-center">
+                                        <button class="btn btn-brand">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model -->
+                    <div class="modal fade" id="modalContactForm3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header text-center">
+                                    <h4 class="modal-title w-100 font-weight-bold">Complete Claim</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+{{--                                <form method="post" action="{{url("/reschedule/claim")}}" enctype="multipart/form-data">--}}
+{{--                                    {{csrf_field()}}--}}
+                                    <input type="hidden" id="jobId" name="jobId" value="{{$job->id}}">
+                                    <div class="modal-body mx-3">
+                                        <div class="md-form">
+                                            <i class="fas fa-pencil prefix grey-text"></i>
+                                            <label data-error="wrong" data-success="right" for="form8">Was the issue repaired?</label>
+                                            <div class="input-group">
+                                                <div class="row col-lg-12 mt-1">
+                                                    <input id="issueRepairedYes" name="priorIssue" type="radio" required><span style="margin-top: -3px;margin-left: 6px;">Yes</span>
+                                                    <input id="issueRepairedNo" name="priorIssue" style="margin-left: 18px" type="radio" required><span style="margin-top: -3px;margin-left: 6px;">No</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="md-form mt-2">
+                                            <i class="fas fa-pencil prefix grey-text"></i>
+                                            <label data-error="wrong" data-success="right" for="form8">Conclusion:</label>
+                                            <textarea type="text" id="conclusion" name="conclusion"
+                                                      class="md-textarea form-control" rows="4" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer d-flex justify-content-center">
+                                        <button class="btn btn-brand" onclick="completeJob()">Submit</button>
+                                    </div>
+{{--                                </form>--}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__head kt-portlet__head--lg">
+                            <div class="kt-portlet__head-label">
+                                <h3 class="kt-portlet__head-title text-uppercase">
+                                    Claim Description
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="kt-portlet__body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Description:</span> {{$job->description}} </p>
+                                </div>
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Service Type:</span> {{$job->service_type}} </p>
                                 </div>
                             </div>
                         </div>
@@ -64,17 +230,54 @@
                         <div class="kt-portlet__head kt-portlet__head--lg">
                             <div class="kt-portlet__head-label">
                                 <h3 class="kt-portlet__head-title text-uppercase">
-                                    Job Description
+                                    Claim Address
                                 </h3>
                             </div>
                         </div>
                         <div class="kt-portlet__body">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <p> {{$job->description}} </p>
+                                    <p><span style="font-weight: 500">City:</span> {{$job->city}} </p>
                                 </div>
                                 <div class="col-lg-12">
-                                    <p> {{$job->service_type}} </p>
+                                    <p><span style="font-weight: 500">Estate:</span> {{$job->estate}} </p>
+                                </div>
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Zip Code:</span> {{$job->zip_code}} </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__head kt-portlet__head--lg">
+                            <div class="kt-portlet__head-label">
+                                <h3 class="kt-portlet__head-title text-uppercase">
+                                    Claim Details
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="kt-portlet__body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Policy No:</span> {{$job->policy_no}} </p>
+                                </div>
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Item Type:</span> {{$job->item_type}} </p>
+                                </div>
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Item Location:</span> {{$job->item_location}} </p>
+                                </div>
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Issue Details:</span> {{$job->issue_details}} </p>
+                                </div>
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Model No:</span> {{$job->model_no}} </p>
+                                </div>
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Serial No:</span> {{$job->serial_no}} </p>
+                                </div>
+                                <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Prior Issue:</span> {{$job->prior_issue}} </p>
                                 </div>
                             </div>
                         </div>
@@ -90,9 +293,9 @@
                         <div class="kt-portlet__body">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <p> {{$customer->name}} </p>
-                                    <p> {{$customer->email}} </p>
-                                    <p> {{$customer->phone}} </p>
+                                    <p><span style="font-weight: 500">Name:</span> {{$customer->name}} </p>
+                                    <p><span style="font-weight: 500">Email:</span> {{$customer->email}} </p>
+                                    <p><span style="font-weight: 500">Phone No:</span> {{$customer->phone}} </p>
                                 </div>
                             </div>
                         </div>
@@ -108,9 +311,9 @@
                         <div class="kt-portlet__body">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <p> {{$job->customer_availability_one}} </p>
-                                    <p> {{$job->customer_availability_two}} </p>
-                                    <p> {{$job->customer_availability_three}} </p>
+                                    <p><span style="font-weight: 500">First:</span> {{$job->customer_availability_one}} </p>
+                                    <p><span style="font-weight: 500">Second:</span> {{$job->customer_availability_two}} </p>
+                                    <p><span style="font-weight: 500">Third:</span> {{$job->customer_availability_three}} </p>
                                 </div>
                             </div>
                         </div>
@@ -126,30 +329,20 @@
                         <div class="kt-portlet__body">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <p> Comming Soon </p>
+                                    <div class="d-flex flex-wrap">
+                                        @if(count($jobImages) != 0)
+                                            @foreach($jobImages as $images)
+                                                <div style="margin-left: 10px">
+                                                    <img style="object-fit: cover;border: 1px solid #a9a9a973;width: 200px;height: 200px;"
+                                                         src="{{env('ADMIN_URL')}}/job-files/{{$images->image}}">
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <p>No Images Attached</p>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-6 order-lg-6 order-xl-6">
-                    <div class="kt-portlet kt-portlet--mobile">
-                        <div class="kt-portlet__head kt-portlet__head--lg">
-                            <div class="kt-portlet__head-label">
-                            <span class="kt-portlet__head-icon">
-                                <i class="kt-font-brand fas fa-briefcase"></i>
-                            </span>
-                                <h3 class="kt-portlet__head-title text-uppercase">
-                                    Job Location ({{$job->job_address}})
-                                </h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kt-portlet kt-portlet--mobile">
-                        <div class="kt-portlet__head kt-portlet__head--lg" style="padding: 0px !important;">
-                            <div class="kt-portlet__head-label">
-                            </div>
-                            <div id="map" style="height:541px!important;width:100%;"></div>
                         </div>
                     </div>
                     <div class="kt-portlet kt-portlet--mobile">
@@ -166,6 +359,27 @@
                                     <p> {{$job->notes}} </p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 order-lg-6 order-xl-6">
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__head kt-portlet__head--lg">
+                            <div class="kt-portlet__head-label">
+                            <span class="kt-portlet__head-icon">
+                                <i class="kt-font-brand fas fa-briefcase"></i>
+                            </span>
+                                <h3 class="kt-portlet__head-title text-uppercase">
+                                    Claim Location ({{$job->job_address}})
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__head kt-portlet__head--lg" style="padding: 0px !important;">
+                            <div class="kt-portlet__head-label">
+                            </div>
+                            <div id="map" style="height:541px!important;width:100%;"></div>
                         </div>
                     </div>
                 </div>
@@ -235,7 +449,7 @@
                         setTimeout(function () {
                             swal.fire({
                                 "title": "",
-                                "text": "Job Status updated Successfully",
+                                "text": "Claim Status updated Successfully",
                                 "type": "success",
                                 "showConfirmButton": false,
                                 "timer": 1500,
@@ -294,7 +508,7 @@
                         setTimeout(function () {
                             swal.fire({
                                 "title": "",
-                                "text": "Job started Successfully",
+                                "text": "Claim started Successfully",
                                 "type": "success",
                                 "showConfirmButton": false,
                                 "timer": 1500,
@@ -324,10 +538,30 @@
         }
 
         function completeJob() {
+            if(document.getElementById('issueRepairedYes').checked === false && document.getElementById('issueRepairedNo').checked === false )
+            {
+                alert('Kindly select any issue repaired status!');
+                return;
+            }
+            if(document.getElementById('conclusion').value === '')
+            {
+                alert('Kindly fill the conclusion!');
+                return;
+            }
             let data = new FormData();
+            let issueRepaired = '';
+            if (document.getElementById('issueRepairedYes').checked === true) {
+                issueRepaired = 'Yes';
+            }
+            if (document.getElementById('issueRepairedNo').checked === true) {
+                issueRepaired = 'No';
+            }
+            let conclusion = document.getElementById('conclusion').value;
             let jobId = document.getElementById('jobId').value;
             data.append("_token", "{{ csrf_token() }}");
             data.append("jobId", jobId);
+            data.append("conclusion", conclusion);
+            data.append("issueRepaired", issueRepaired);
             KTApp.blockPage({
                 baseZ: 2000,
                 overlayColor: '#000000',
@@ -353,7 +587,7 @@
                         setTimeout(function () {
                             swal.fire({
                                 "title": "",
-                                "text": "Job Completed Successfully",
+                                "text": "Claim Completed Successfully",
                                 "type": "success",
                                 "showConfirmButton": false,
                                 "timer": 1500,

@@ -16,7 +16,11 @@ class DashboardController extends Controller
         $customersCount = Customer::all()->count();
         $technicianCount = Technician::all()->count();
         $jobsCount = DispatchJob::all()->count();
-        return view('dashboard/dashboard')->with(['customersCount' => $customersCount,'technicianCount' => $technicianCount,'jobsCount' => $jobsCount]);
+        $awaitingJobAcceptanceCount = DispatchJob::where(['id_technician' => Session::get('userId'), 'status' => 'offered'])->count();
+        $openJobsCount = DispatchJob::where(['id_technician' => Session::get('userId'), 'status' => 'offered'])->count();
+        $closedJobsCount = DispatchJob::where(['id_technician' => Session::get('userId'), 'status' => 'Completed'])->count();
+        $jobsReceivedCount = DispatchJob::where('id_technician', Session::get('userId'))->count();
+        return view('dashboard/dashboard')->with(['jobsReceivedCount' => $jobsReceivedCount,'closedJobsCount' => $closedJobsCount,'openJobsCount' => $openJobsCount,'awaitingJobAcceptanceCount' => $awaitingJobAcceptanceCount,'customersCount' => $customersCount,'technicianCount' => $technicianCount,'jobsCount' => $jobsCount]);
     }
 
     public function profile(){

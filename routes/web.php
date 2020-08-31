@@ -50,10 +50,17 @@ Route::post('workers/save', 'WorkerController@saveWorker');
 Route::get('workers/manage/{id}', 'WorkerController@editWorker');
 Route::post('workers/update', 'WorkerController@updateWorker');
 Route::post('job/accept', 'JobsController@acceptJob');
+Route::post('job/reject', 'JobsController@rejectJob');
 Route::post('job/schedule', 'JobsController@scheduleJob');
 Route::get('job/{token}/worker/view', 'WorkerController@workerView');
 Route::post('job/on-my-way', 'WorkerController@onMyWay');
 Route::post('job/start', 'WorkerController@startJob');
 Route::post('job/complete', 'WorkerController@completeJob');
 Route::get('job/{token}/track', 'CustomerController@trackJob');
+Route::post('forgot-password-request', 'AuthController@forgotPasswordRequest');
+Route::post('forgot-password-change', 'AuthController@changePassword');
+Route::get('set-password/{email}/get', 'AuthController@setPasswordPage');
+Route::post('followup/reason', 'JobsController@followUpReasonStore');
+Route::post('reschedule/claim', 'JobsController@rescheduleClaim');
+Route::post('give-rating', 'JobsController@giveRating');
 
