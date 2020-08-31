@@ -44,7 +44,7 @@ class CustomerJobCreatedEmail implements ShouldQueue
      */
     public function handle()
     {
-        $subject = new SendEmailService(new EmailSubject("Hi, Your job has been Created in "."   ". env('APP_NAME')));
+        $subject = new SendEmailService(new EmailSubject("Hi, Your claim has been Created in "."   ". env('APP_NAME')));
         $mailTo = $this->userEmail;
         $invitationMessage = new JobCreationMessage();
         $emailBody = $invitationMessage->creationMessage($this->jobId);

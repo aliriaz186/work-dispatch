@@ -17,7 +17,7 @@
                                 <i class="kt-font-brand fas fa-briefcase"></i>
                             </span>
                                 <h3 class="kt-portlet__head-title">
-                                    Jobs
+                                    Claims
                                 </h3>
                             </div>
                         </div>

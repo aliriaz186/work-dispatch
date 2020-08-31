@@ -46,7 +46,7 @@ class JobScheduledForTechnician implements ShouldQueue
      */
     public function handle()
     {
-        $subject = new SendEmailService(new EmailSubject("Hi, A job assigned to you in "."   ". env('APP_NAME')));
+        $subject = new SendEmailService(new EmailSubject("Hi, A claim assigned to you in "."   ". env('APP_NAME')));
         $mailTo = $this->userEmail;
         $invitationMessage = new JobScheduleForTechnicanMessage();
         $emailBody = $invitationMessage->message($this->jobId, $this->schedulesId);

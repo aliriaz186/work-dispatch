@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Customer;
 use App\DispatchJob;
+use App\JobRating;
 use App\ScheduledJob;
 use App\Technician;
 use App\Worker;
@@ -103,7 +104,13 @@ class CustomerController extends Controller
             }else{
                 $worker ="";
             }
-            return view('customer.customer-view')->with(['job' => $job, 'customer' => $customer, 'technician' => $technician, 'schedule' => $schedule, "worker" => $worker]);
+            $ratingStatus = '';
+            if (JobRating::where('jobId', $jobId)->exists()) {
+                $ratingStatus = true;
+            } else {
+                $ratingStatus = false;
+            }
+            return view('customer.customer-view')->with(['ratingStatus' => $ratingStatus, 'job' => $job, 'customer' => $customer, 'technician' => $technician, 'schedule' => $schedule, "worker" => $worker]);
         }catch (\Exception $exception){
             return json_encode("Access Denied.");
         }

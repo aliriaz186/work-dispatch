@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\TechnicianInvitationJob;
 use App\Technician;
+use App\WorkerWorkType;
 use Illuminate\Http\Request;
 use services\email_services\EmailAddress;
 
@@ -59,6 +60,13 @@ class TechnicianController extends Controller
                 $technician->password = "12345";
             }
             $result = $technician->save();
+            $arrayWorkType = explode(',', $request->checkBoxesArray);
+            for ($i = 0; $i < count($arrayWorkType); $i++) {
+                $workerWorkType = new WorkerWorkType();
+                $workerWorkType->technician_id = $technician->id;
+                $workerWorkType->type = $arrayWorkType[$i];
+                $workerWorkType->save();
+            }
             TechnicianInvitationJob::dispatch(new EmailAddress($technician->email), $technician->password);
             return json_encode(['status' => $result]);
         } catch (\Exception $exception) {
