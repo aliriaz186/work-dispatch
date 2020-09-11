@@ -36,16 +36,19 @@
                             <div class="kt-portlet__body">
                                 <div class="row">
                                     @if(!empty($ratings->rating))
-                                        <div class="col-lg-12">
-                                            <p><span
-                                                    style="font-weight: 500">Rating:</span> {{$ratings->rating}} out of 5
-                                            </p>
-                                        </div>
-                                        <div class="col-lg-12">
-                                            <p><span
-                                                    style="font-weight: 500">Additional Comments:</span> {{$ratings->additional_comments}}
-                                            </p>
-                                        </div>
+                                        @foreach($ratings as $item)
+                                            <div class="col-lg-12">
+                                                <p><span
+                                                        style="font-weight: 500">Rating:</span> {{$item->rating}} out of
+                                                    5
+                                                </p>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <p><span
+                                                        style="font-weight: 500">Additional Comments:</span> {{$item->additional_comments}}
+                                                </p>
+                                            </div>
+                                        @endforeach
                                     @else
                                         <div class="col-lg-12">
                                             <p>No reviews yet!</p>
@@ -175,6 +178,22 @@
                         <div class="kt-portlet__head kt-portlet__head--lg">
                             <div class="kt-portlet__head-label">
                                 <h3 class="kt-portlet__head-title text-uppercase">
+                                    Claim Location
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="kt-portlet__body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <p> {{$job->job_address}} </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__head kt-portlet__head--lg">
+                            <div class="kt-portlet__head-label">
+                                <h3 class="kt-portlet__head-title text-uppercase">
                                     Claim Details
                                 </h3>
                             </div>
@@ -236,7 +255,7 @@
                                 <div class="col-lg-12">
                                     <p><span style="font-weight: 500">First:</span> {{$job->customer_availability_one}} </p>
                                     <p><span style="font-weight: 500">Second:</span> {{$job->customer_availability_two}} </p>
-                                    <p><span style="font-weight: 500">Third:</span> {{$job->customer_availability_three}} </p>
+{{--                                    <p><span style="font-weight: 500">Third:</span> {{$job->customer_availability_three}} </p>--}}
                                 </div>
                             </div>
                         </div>
@@ -409,7 +428,7 @@
             $(document).ready(function () {
                 const today = new Date()
                 const tomorrow = new Date(today)
-                tomorrow.setDate(tomorrow.getDate() + 1)
+                tomorrow.setDate(tomorrow.getDate() + 2)
                 $('#s-date').datepicker('setStartDate', new Date());
                 $('#s-date').datepicker('setEndDate', tomorrow);
             });

@@ -63,4 +63,5 @@ Route::get('set-password/{email}/get', 'AuthController@setPasswordPage');
 Route::post('followup/reason', 'JobsController@followUpReasonStore');
 Route::post('reschedule/claim', 'JobsController@rescheduleClaim');
 Route::post('give-rating', 'JobsController@giveRating');
+Route::get('reviews', 'ReviewController@getView');
 

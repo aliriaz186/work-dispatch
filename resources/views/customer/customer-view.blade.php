@@ -334,7 +334,7 @@
                                 </div>
 
                                 <div class="kt-portlet__head-label" style="padding: 20px">
-                                    <img style="object-fit: cover;width: 519px;height: 382px;"
+                                    <img style="object-fit: contain;width: 519px;height: 382px;"
                                          src="{{env('ADMIN_URL')}}/media/dummy-claim-pic.png">
                                 </div>
 

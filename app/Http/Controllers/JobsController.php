@@ -214,7 +214,7 @@ class JobsController extends Controller
             $workerName = '';
         }
         $jobImages = JobImages::where('job_id', $jobId)->get();
-        $ratings = JobRating::where('jobId', $jobId)->first();
+        $ratings = JobRating::where('jobId', $jobId)->get();
         return view('dashboard.job-details')->with(['ratings' => $ratings,'jobImages' => $jobImages,'job' => $job, 'customer' => $customer, 'technician' => $technician, 'workers' => $workers, 'schedule' => $schedule, 'workerName' => $workerName]);
     }
 
