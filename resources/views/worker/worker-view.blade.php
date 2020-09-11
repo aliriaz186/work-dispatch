@@ -156,7 +156,7 @@
                                         <div class="md-form">
                                             <i class="fas fa-pencil prefix grey-text"></i>
                                             <p>Reschedule Date</p>
-                                            <input type="date" id="sDate" name="sDate" placeholder="Select date" required>
+                                            <input type="datetime-local" id="sDate" name="sDate" placeholder="Select date" required>
                                         </div>
                                     </div>
                                     <div class="modal-footer d-flex justify-content-center">
@@ -389,6 +389,16 @@
         <p id="long" style="display: none">{{$job->long}}</p>
         <p id="lat" style="display: none">{{$job->lat}}</p>
         <script>
+            // $(document).ready(function(){
+            //     var maxDate = new Date(Date.now() + 62 * 60 * 60 * 1000).toISOString();
+            //     elem = document.getElementById("sDate")
+            //     var iso = new Date().toISOString();
+            //     var minDate = iso.substring(0,iso.length-1);
+            //     elem.min = minDate
+            //     elem.max = maxDate
+            //     console.log('min',minDate);
+            //     console.log('max',maxDate);
+            // });
             let marker = false; ////Has the user plotted their location marker?
             let lati = parseFloat(document.getElementById('lat').innerText);
             let longi = parseFloat(document.getElementById('long').innerText);
