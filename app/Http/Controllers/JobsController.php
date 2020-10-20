@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\ClaimFollowUp;
 use App\ClaimReschedule;
+use App\ClaimRescheduleNotHome;
 use App\Customer;
 use App\DispatchJob;
 use App\JobImages;
+use App\JobInvoices;
 use App\JobRating;
 use App\Jobs\CustomerJobCreatedEmail;
 use App\Jobs\JobScheduledForCustomer;
 use App\Jobs\JobScheduledForTechnician;
+use App\RejectClaimReason;
 use App\ScheduledJob;
 use App\Technician;
 use App\Worker;
@@ -55,6 +58,11 @@ class JobsController extends Controller
 
     public function rejectJob(Request $request){
         try {
+            $rejectClaim = new RejectClaimReason();
+            $rejectClaim->job_id = $request->jobId;
+            $rejectClaim->reason = $request->deniedReason;
+            $rejectClaim->customer_message = $request->customerMessage;
+            $rejectClaim->save();
             $job = DispatchJob::where('id', $request->jobId)->first();
             $job->status = 'rejected';
             return json_encode(['status' => $job->update()]);
@@ -215,7 +223,8 @@ class JobsController extends Controller
         }
         $jobImages = JobImages::where('job_id', $jobId)->get();
         $ratings = JobRating::where('jobId', $jobId)->get();
-        return view('dashboard.job-details')->with(['ratings' => $ratings,'jobImages' => $jobImages,'job' => $job, 'customer' => $customer, 'technician' => $technician, 'workers' => $workers, 'schedule' => $schedule, 'workerName' => $workerName]);
+        $followUp = ClaimFollowUp::where('job_id', $jobId)->first();
+        return view('dashboard.job-details')->with(['followUp' => $followUp, 'ratings' => $ratings,'jobImages' => $jobImages,'job' => $job, 'customer' => $customer, 'technician' => $technician, 'workers' => $workers, 'schedule' => $schedule, 'workerName' => $workerName]);
     }
 
     public function followUpReasonStore(Request $request){
@@ -238,7 +247,23 @@ class JobsController extends Controller
         $dispatchJob->status = 'scheduled';
         $dispatchJob->update();
         $scheduledJob = ScheduledJob::where('id_job', $request->jobId)->first();
-        $scheduledJob->date = $request->sDate;
+        $sDate = explode('T', $request->sDate)[0];
+        $scheduledJob->date = $sDate;
+        $scheduledJob->update();
+        return redirect()->back();
+    }
+
+    public function rescheduleClaimNotHome(Request $request){
+        $claimReschedule = new ClaimRescheduleNotHome();
+        $claimReschedule->job_id = $request->jobId;
+        $claimReschedule->reason = $request->reason;
+        $claimReschedule->save();
+        $dispatchJob = DispatchJob::where('id', $request->jobId)->first();
+        $dispatchJob->status = 'scheduled';
+        $dispatchJob->update();
+        $scheduledJob = ScheduledJob::where('id_job', $request->jobId)->first();
+        $sDate = explode('T', $request->sDate)[0];
+        $scheduledJob->date = $sDate;
         $scheduledJob->update();
         return redirect()->back();
     }
@@ -252,6 +277,24 @@ class JobsController extends Controller
         $jobRating->additional_comments = $request->additionalComments;
         $jobRating->save();
         return redirect()->back();
+    }
+
+    public function saveInvoice(Request $request)
+    {
+        if ($request->hasfile('offer_images')) {
+            $images = "";
+            $files = $request->file('offer_images');
+            foreach ($files as $key => $file) {
+                $key = $key + 1;
+                $name = time() . "-{$key}." . $file->getClientOriginalExtension();
+                $file->move(public_path() . '/new-invoices/', $name);
+                $jobInvoices = new JobInvoices();
+                $jobInvoices->job_id = $request->jobId;
+                $jobInvoices->invoice = $name;
+                $jobInvoices->status = 'open';
+                $jobInvoices->save();
+            }
+        }
     }
 
 }

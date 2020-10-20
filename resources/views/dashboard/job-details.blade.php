@@ -14,6 +14,15 @@
                     <div class="kt-portlet kt-portlet--mobile">
                         <div class="kt-portlet__head kt-portlet__head--lg">
                             <div class="kt-portlet__head-label">
+                                <h3 class="kt-portlet__head-title text-uppercase">
+                                    <span style="font-weight: 500">Claim No:</span> {{$job->id}}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__head kt-portlet__head--lg">
+                            <div class="kt-portlet__head-label">
                             <span class="kt-portlet__head-icon">
                                 <i class="kt-font-brand fas fa-briefcase"></i>
                             </span>
@@ -29,13 +38,41 @@
                             <div class="kt-portlet__head kt-portlet__head--lg">
                                 <div class="kt-portlet__head-label">
                                     <h3 class="kt-portlet__head-title text-uppercase">
+                                        Attach Invoice
+                                    </h3>
+                                </div>
+                            </div>
+                            @if(!\App\JobInvoices::where('job_id', $job->id)->exists())
+                            <div class="kt-portlet__body">
+                                <div class="row">
+                                    <label for="offer-images">Select file to upload: </label>
+                                    <div class="input-group">
+                                        <input id="offer-images" onclick="selectImages()" type="file" name="images[]"
+                                               multiple/>
+                                    </div>
+                                </div>
+                            </div>
+                            @else
+                                <div style="margin-left: 10px">
+                                    <a target="_blank" href="{{asset('new-invoices')}}/{{\App\JobInvoices::where('job_id', $job->id)->first()['invoice']}}">
+                                    <img style="padding:20px;object-fit: cover;border: 1px solid #a9a9a973;width: 200px;height: 200px;" alt="Click to Open"
+                                         src="{{asset('new-invoices')}}/{{\App\JobInvoices::where('job_id', $job->id)->first()['invoice']}}"></a>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+                    @if($job->status == 'Completed')
+                        <div class="kt-portlet kt-portlet--mobile">
+                            <div class="kt-portlet__head kt-portlet__head--lg">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title text-uppercase">
                                         Reviews
                                     </h3>
                                 </div>
                             </div>
                             <div class="kt-portlet__body">
                                 <div class="row">
-                                    @if(!empty($ratings->rating))
+                                    @if(count($ratings) != 0)
                                         @foreach($ratings as $item)
                                             <div class="col-lg-12">
                                                 <p><span
@@ -72,13 +109,19 @@
                                     @if($job->status == 'offered')
                                         <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center" >{{$job->status}}</p>
                                         <button class="btn btn-brand btn-sm" onclick="acceptJob()">Accept</button>
-                                        <button class="btn btn-danger btn-sm" style="background-color: #0780b7;border-color: #0780b7;color: white;" onclick="rejectJob()">Reject</button>
+                                        <button class="btn btn-danger btn-sm" style="background-color: #0780b7;border-color: #0780b7;color: white;" data-toggle="modal" data-target="#exampleModal">Reject</button>
                                     @endif
-                                    @if($job->status == 'scheduled')
-                                        <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center" >{{$job->status}}</p>
-                                        <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})</p>
-                                        <p>Technician : {{$workerName}}</p>
-                                    @endif
+                                        @if($job->status == 'scheduled')
+                                            <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">{{$job->status}}</p>
+                                            @if(\App\ClaimRescheduleNotHome::where('job_id', $job->id)->exists())
+                                                <p>We missed you, and will try you again on {{$schedule->date}} between
+                                                    ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})</p>
+                                            @else
+                                                <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}}
+                                                    - {{$schedule->est_time_to}})</p>
+                                            @endif
+                                            <p>Technician : {{$workerName}}</p>
+                                        @endif
                                     @if($job->status == 'unscheduled')
                                         <p style="color: red; padding: 5px; border-radius: 10px; border: 1px solid red; width: 100px;text-align: center">{{$job->status}}</p>
                                         <p>Schedule the claim</p>
@@ -105,6 +148,7 @@
                                         </select>
                                         <div>
                                             <button class="btn btn-brand btn-sm" style="margin-top: 10px" onclick="scheduleJob()">Schedule Claim</button>
+                                            <button class="btn btn-brand btn-sm" style="margin-top: 10px" data-toggle="modal" data-target="#modalContactForm">+ Add Technician</button>
                                         </div>
                                     @endif
                                         @if($job->status == 'On My Way')
@@ -127,12 +171,140 @@
                                         @if($job->status == 'rejected')
                                             <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 150px;text-align: center">
                                                 Claim Rejected</p>
-{{--                                            <p>Technician : {{$workerName}}</p>--}}
+                                        @endif
+                                        @if(\App\DispatchJob::where('id', $job->id)->first()['status'] == 'Follow Up')
+                                            <h6>Claim was Follow Up</h6>
+                                            <p><span style="font-weight: 500">Reason:</span> {{$followUp->reason}} </p>
+                                            <h5>--Awaiting response from Priority Home Warranty--</h5>
+                                            <a style="text-decoration: underline;text-align: center" href="tel:8888121060">Click to Call Admin Office</a>
                                         @endif
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="modal fade" id="modalContactForm" tabindex="-1" role="dialog"
+                         aria-labelledby="myModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header text-center">
+                                    <h3 class="kt-portlet__head-title">
+                                        New Technician
+                                    </h3>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form action="#" method="POST" id="listing_form1" class="form-horizontal listing_form1">
+                                    {{ csrf_field() }}
+                                    <div class="row">
+                                        <div class="col-xl-12 order-lg-12 order-xl-12">
+                                            <div class="kt-portlet kt-portlet--mobile">
+                                                <div class="kt-portlet__body">
+                                                    <div class="row">
+                                                        <div class="col-lg-4">
+                                                            <label class="">Full Name <span class="text-danger">*</span></label>
+                                                            <input type="text" name="name" id="name"
+                                                                   class="form-control"
+                                                                   placeholder="Enter full name">
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <label>Email <span class="text-danger">*</span></label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-prepend"><span
+                                                                        class="input-group-text"><i
+                                                                            class="fa fa-envelope"></i></span></div>
+                                                                <input type="text" name="email" id="email"
+                                                                       class="form-control"
+                                                                       placeholder="Enter email">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <label>Phone <span class="text-danger">*</span></label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-prepend"><span
+                                                                        class="input-group-text"><i
+                                                                            class="fa fa-phone"></i></span></div>
+                                                                <input type="text" name="phone" id="phone"
+                                                                       class="form-control"
+                                                                       placeholder="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-4">
+                                                        <div class="col-lg-12">
+                                                            <label>Type of work <span
+                                                                    class="text-danger">*</span></label>
+                                                            <div class="input-group">
+                                                                <div class="row col-lg-12 mt-1">
+                                                                    <input id="plumbing-work" type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Plumbing</span>
+                                                                    <input id="electrician-work"
+                                                                           style="margin-left: 129px"
+                                                                           type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Electrician</span>
+                                                                    <input id="hvac-work" style="margin-left: 139px"
+                                                                           type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Hvac</span>
+                                                                </div>
+                                                                <div class="row col-lg-12 mt-1">
+                                                                    <input id="garage-doors-work" type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Garage Doors</span>
+                                                                    <input id="appliances-work"
+                                                                           style="margin-left: 100px"
+                                                                           type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Appliances</span>
+                                                                    <input id="drywall-work" style="margin-left: 133px"
+                                                                           type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Drywall</span>
+                                                                </div>
+                                                                <div class="row col-lg-12 mt-1">
+                                                                    <input id="roof-repair-work" style=""
+                                                                           type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Roof Repair</span>
+                                                                    <input id="septic-system-work"
+                                                                           style="margin-left: 117px"
+                                                                           type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Septic System</span>
+                                                                    <input id="pools-work" style="margin-left: 114px"
+                                                                           type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Pools</span>
+                                                                </div>
+                                                                <div class="row col-lg-12 mt-1">
+                                                                    <input id="central-vacuum-work"
+                                                                           type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">Central Vacuum</span>
+                                                                    <input id="other-work" style="margin-left: 85px"
+                                                                           type="checkbox"><span
+                                                                        style="margin-top: -3px;margin-left: 6px;">other</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="kt-portlet kt-portlet--mobile">
+                                                <div class="kt-portlet__foot">
+                                                    <div class="kt-form__actions">
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <button type="submit" class="btn btn-brand">Save
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="kt-portlet kt-portlet--mobile">
                         <div class="kt-portlet__head kt-portlet__head--lg">
                             <div class="kt-portlet__head-label">
@@ -163,6 +335,9 @@
                         <div class="kt-portlet__body">
                             <div class="row">
                                 <div class="col-lg-12">
+                                    <p><span style="font-weight: 500">Location:</span> {{$job->job_address}} </p>
+                                </div>
+                                <div class="col-lg-12">
                                     <p><span style="font-weight: 500">City:</span> {{$job->city}} </p>
                                 </div>
                                 <div class="col-lg-12">
@@ -174,7 +349,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet kt-portlet--mobile" style="display: none">
                         <div class="kt-portlet__head kt-portlet__head--lg">
                             <div class="kt-portlet__head-label">
                                 <h3 class="kt-portlet__head-title text-uppercase">
@@ -255,12 +430,11 @@
                                 <div class="col-lg-12">
                                     <p><span style="font-weight: 500">First:</span> {{$job->customer_availability_one}} </p>
                                     <p><span style="font-weight: 500">Second:</span> {{$job->customer_availability_two}} </p>
-{{--                                    <p><span style="font-weight: 500">Third:</span> {{$job->customer_availability_three}} </p>--}}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet kt-portlet--mobile" style="display: none">
                         <div class="kt-portlet__head kt-portlet__head--lg">
                             <div class="kt-portlet__head-label">
                                 <h3 class="kt-portlet__head-title text-uppercase">
@@ -390,6 +564,36 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Claim Denied</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close-button">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <p><span style="font-weight: 500">Reason:</span></p>
+                                <input class="form-control" id="deniedReason" name="deniedReason">
+                                <ul id="reason" class="small" style="color: red;display: none"><li>Reason cannot be null</li></ul>
+                            </div>
+                            <div class="mt-3">
+                                <p><span style="font-weight: 500">Message For Customer:</span></p>
+                                <input class="form-control" id="customerMessage" name="customerMessage">
+                                <ul id="message" class="small" style="color: red;display: none"><li>Message cannot be null</li></ul>
+                            </div>
+                            <div>
+                                <button type="button" id="send-email-btn" class="btn btn-success"
+                                        style="background-color: #0780b7!important;border-color: #0780b7;color: white;margin-top: 15px;border: none!important;" onclick="rejectJob()">Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <p id="long" style="display: none">{{$job->long}}</p>
         <p id="lat" style="display: none">{{$job->lat}}</p>
@@ -423,25 +627,129 @@
                 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJqJcwaHOlWKivApYFYSjmVobGeKFqGdE&callback=initMap">
         </script>
     </div>
+
+    <script type="text/javascript">
+        function selectImages() {
+            if (window.File && window.FileList && window.FileReader) {
+                var filesInput = document.getElementById("offer-images");
+
+                filesInput.addEventListener("change", function (event) {
+                    var files = [];
+                    files = event.target.files; //FileList object
+                    var output = document.getElementById("result");
+                    for (var i = 0; i < files.length; i++) {
+                        var file = files[i];
+
+                        //Only pics
+                        if (!file.type.match('image'))
+                            continue;
+
+                        var picReader = new FileReader();
+
+                        picReader.addEventListener("load", function (event) {
+
+                            var picFile = event.target;
+
+                            var div = document.createElement("span");
+
+                            div.innerHTML = "<img class='thumbnail' src='" + picFile.result + "'" +
+                                "title='" + picFile.name + "'/>";
+
+                            output.insertBefore(div, null);
+
+                        });
+
+                        //Read the image
+                        picReader.readAsDataURL(file);
+                    }
+                    KTApp.blockPage({
+                        baseZ: 2000,
+                        overlayColor: '#000000',
+                        type: 'v1',
+                        state: 'danger',
+                        opacity: 0.15,
+                        message: 'Processing...'
+                    });
+                    var offerImages = document.getElementById('offer-images').files;
+
+                    let formData = new FormData();
+                    for (var i = 0; i < offerImages.length; i++) {
+                        formData.append("offer_images[]", offerImages[i]);
+                    }
+                    let jobId = document.getElementById('jobId').value;
+                    formData.append("jobId", jobId);
+                    formData.append("_token", "{{ csrf_token() }}");
+                    $.ajax
+                    ({
+                        type: 'POST',
+                        url: `{{env('APP_URL')}}/job/invoice/save`,
+                        data: formData,
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        success: function (data) {
+                            setTimeout(function () {
+                                KTApp.unblockPage();
+                            }, 1000);
+                            setTimeout(function () {
+                                swal.fire({
+                                    "title": "",
+                                    "text": "Saved Successfully",
+                                    "type": "success",
+                                    "showConfirmButton": false,
+                                    "timer": 1500,
+                                    "onClose": function (e) {
+                                        setTimeout(function () {
+                                            KTApp.unblockPage();
+                                        }, 1000);
+                                        window.location.reload();
+                                    }
+                                })
+                            }, 2000);
+                        },
+                        error: function (data) {
+                            checkBoxesArray = [];
+                            setTimeout(function () {
+                                KTApp.unblockPage();
+                            }, 1000);
+                            setTimeout(function () {
+                                swal.fire({
+                                    "title": "",
+                                    "text": result['message'],
+                                    "type": "error",
+                                    "confirmButtonClass": "btn btn-secondary",
+                                    "onClose": function (e) {
+                                        console.log('on close event fired!');
+                                    }
+                                })
+                            }, 2000);
+                        }
+                    });
+
+                });
+            } else {
+                console.log("Your browser does not support File API");
+            }
+        }</script>
+
     <script>
         window.onload = (event) => {
             $(document).ready(function () {
-                const today = new Date()
-                const tomorrow = new Date(today)
+                const today = new Date();
+                const tomorrow = new Date(today);
+                var today1 = new Date();
+                var day = today1.getDay();
+                var daylist = ["Sunday", "Monday", "Tuesday", "Wednesday ", "Thursday", "Friday", "Saturday"];
+                if (daylist[day] === 'Friday') {
+                    tomorrow.setDate(tomorrow.getDate() + 3)
+                    $('#s-date').datepicker('setStartDate', new Date());
+                    $('#s-date').datepicker('setEndDate', tomorrow);
+                }
                 tomorrow.setDate(tomorrow.getDate() + 2)
                 $('#s-date').datepicker('setStartDate', new Date());
                 $('#s-date').datepicker('setEndDate', tomorrow);
             });
         };
-        // function disablingDateField() {
-        //     $(document).ready(function () {
-        //         const today = new Date()
-        //         const tomorrow = new Date(today)
-        //         tomorrow.setDate(tomorrow.getDate() + 1)
-        //         $('#s-date').datepicker('setStartDate', new Date());
-        //         $('#s-date').datepicker('setEndDate', tomorrow);
-        //     });
-        // }
 
         function scheduleJob() {
             let date = document.getElementById('s-date').value;
@@ -607,11 +915,27 @@
         }
 
         function rejectJob(){
+            document.getElementById('reason').style.display = 'none';
+            document.getElementById('message').style.display = 'none';
+            if(document.getElementById('deniedReason').value === '' || document.getElementById('deniedReason').value === null)
+            {
+                document.getElementById('reason').style.display = 'block';
+                return;
+            }
+            if(document.getElementById('customerMessage').value === '' || document.getElementById('customerMessage').value === null)
+            {
+                document.getElementById('message').style.display = 'block';
+                return;
+            }
             let data = new FormData();
             let jobId = document.getElementById('jobId').value;
+            let deniedReason = document.getElementById('deniedReason').value;
+            let customerMessage = document.getElementById('customerMessage').value;
             console.log(jobId)
             data.append("_token", "{{ csrf_token() }}");
             data.append("jobId", jobId);
+            data.append("deniedReason", deniedReason);
+            data.append("customerMessage", customerMessage);
             KTApp.blockPage({
                 baseZ: 2000,
                 overlayColor: '#000000',
@@ -745,6 +1069,177 @@
                                             "timer": 1500,
                                             "onClose": function (e) {
                                                 window.location.href = `{{env('APP_URL')}}/customers`
+                                            }
+                                        })
+                                    }, 2000);
+                                } else {
+                                    setTimeout(function () {
+                                        KTApp.unblockPage();
+                                    }, 1000);
+                                    setTimeout(function () {
+                                        swal.fire({
+                                            "title": "",
+                                            "text": result['message'],
+                                            "type": "error",
+                                            "confirmButtonClass": "btn btn-secondary",
+                                            "onClose": function (e) {
+                                                console.log('on close event fired!');
+                                            }
+                                        })
+                                    }, 2000);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+        });
+
+    </script>
+
+    <script>
+        let checkBoxesArray = [];
+        $(document).ready(function () {
+            KTApp.blockPage({
+                baseZ: 2000,
+                overlayColor: '#000000',
+                type: 'v1',
+                state: 'danger',
+                opacity: 0.15,
+                message: 'Loading Please Wait...'
+            });
+            setTimeout(function () {
+                KTApp.unblockPage();
+            }, 3000);
+
+            $(function () {
+                // Initialize form validation.
+                $(".listing_form1").validate({
+                    // Specify validation rules
+                    rules: {
+                        name: {required: true},
+                        email: {email: true, required: true},
+                        phone: {required: true, minlength: 10},
+
+                    },
+                    // Specify validation error messages
+                    messages: {
+                        name: "Please enter name",
+                        email: "Please enter email address",
+                        phone: {
+                            required: "Please provide a phone number",
+                            minlength: "Your phone number must be 10 characters long"
+                        },
+                    },
+                    // Invalid Handler message
+                    invalidHandler: function (event, validator) {
+                        swal.fire({
+                            "title": "",
+                            "text": "There are some errors in your submission. Please correct them.",
+                            "type": "error",
+                            "confirmButtonClass": "btn btn-secondary",
+                            "onClose": function (e) {
+                                checkBoxesArray = [];
+                            }
+                        })
+                    },
+                    // Here we submit the completed form to database
+                    submitHandler: function (form, e) {
+                        // Enable Page Loading
+                        if (document.getElementById('other-work').checked === false && document.getElementById('central-vacuum-work').checked === false && document.getElementById('pools-work').checked === false && document.getElementById('septic-system-work').checked === false && document.getElementById('roof-repair-work').checked === false && document.getElementById('drywall-work').checked === false && document.getElementById('appliances-work').checked === false && document.getElementById('garage-doors-work').checked === false && document.getElementById('hvac-work').checked === false && document.getElementById('electrician-work').checked === false && document.getElementById('plumbing-work').checked === false) {
+                            swal.fire({
+                                "title": "",
+                                "text": "Please select atleast one work type",
+                                "type": "error",
+                                "confirmButtonClass": "btn btn-secondary",
+                                "onClose": function (e) {
+                                    console.log('on close event fired!');
+                                }
+                            })
+                            event.preventDefault();
+                            return;
+                        }
+                        if(document.getElementById('plumbing-work').checked === true)
+                        {
+                            checkBoxesArray.push('Plumbing');
+                        }
+                        if(document.getElementById('electrician-work').checked === true)
+                        {
+                            checkBoxesArray.push('Electrician');
+                        }
+                        if(document.getElementById('hvac-work').checked === true)
+                        {
+                            checkBoxesArray.push('Hvac');
+                        }
+                        if(document.getElementById('garage-doors-work').checked === true)
+                        {
+                            checkBoxesArray.push('Garage Doors');
+                        }
+                        if(document.getElementById('appliances-work').checked === true)
+                        {
+                            checkBoxesArray.push('Appliances');
+                        }
+                        if(document.getElementById('drywall-work').checked === true)
+                        {
+                            checkBoxesArray.push('Drywall');
+                        }
+                        if(document.getElementById('roof-repair-work').checked === true)
+                        {
+                            checkBoxesArray.push('Roof Repair');
+                        }
+                        if(document.getElementById('septic-system-work').checked === true)
+                        {
+                            checkBoxesArray.push('Septic System');
+                        }
+                        if(document.getElementById('pools-work').checked === true)
+                        {
+                            checkBoxesArray.push('Pools');
+                        }
+                        if(document.getElementById('central-vacuum-work').checked === true)
+                        {
+                            checkBoxesArray.push('Central Vacuum');
+                        }
+                        if(document.getElementById('other-work').checked === true)
+                        {
+                            checkBoxesArray.push('Other');
+                        }
+                        KTApp.blockPage({
+                            baseZ: 2000,
+                            overlayColor: '#000000',
+                            type: 'v1',
+                            state: 'danger',
+                            opacity: 0.15,
+                            message: 'Processing...'
+                        });
+                        var form = $('.listing_form1');
+                        var data = form.serializeArray();
+                        data.push({
+                            "name": "checkBoxesArray",
+                            "value": checkBoxesArray
+                        });
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        $.ajax({
+                            url: "{{env('APP_URL')}}/workers/save",
+                            type: 'POST',
+                            dataType: "JSON",
+                            data: data,
+                            success: function (result) {
+                                if (result['status']) {
+                                    // Disable Page Loading and show confirmation
+                                    setTimeout(function () {
+                                        KTApp.unblockPage();
+                                    }, 1000);
+                                    setTimeout(function () {
+                                        swal.fire({
+                                            "title": "",
+                                            "text": "Saved Successfully",
+                                            "type": "success",
+                                            "showConfirmButton": false,
+                                            "timer": 1500,
+                                            "onClose": function (e) {
+                                                window.location.reload();
                                             }
                                         })
                                     }, 2000);

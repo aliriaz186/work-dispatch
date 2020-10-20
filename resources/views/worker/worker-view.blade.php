@@ -37,8 +37,14 @@
                                 <div class="col-lg-12">
                                     @if($job->status == 'scheduled')
                                         <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">{{$job->status}}</p>
-                                        <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})</p>
-                                    <p>Change status</p>
+                                        @if(\App\ClaimRescheduleNotHome::where('job_id', $job->id)->exists())
+                                            <p>We missed you, and will try you again on {{$schedule->date}} between
+                                                ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})</p>
+                                        @else
+                                            <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}}
+                                                - {{$schedule->est_time_to}})</p>
+                                        @endif
+                                        <p>Change status</p>
                                         <button class="btn btn-brand" onclick="onMyWay()">On my Way</button>
                                     @endif
                                         @if($job->status == 'On My Way')
@@ -47,6 +53,7 @@
                                                 - {{$schedule->est_time_to}})</p>
                                             <p>Change status</p>
                                             <button class="btn btn-brand" onclick="startJob()">Start Claim</button>
+                                            <button class="btn btn-brand" style="background-color: #0780b7!important;border-color: #0780b7!important" data-toggle="modal" data-target="#modalContactForm3">Customer Was Not Home</button>
                                         @endif
                                         @if($job->status == 'Job Started')
                                             <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Claim Started!</p>
@@ -58,8 +65,8 @@
                                         @if($job->status == 'Follow Up')
                                             <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Follow Up</p>
                                         @endif
-                                        @if($job->status == 'Denied')
-                                            <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Denied</p>
+                                        @if($job->status == 'rejected')
+                                            <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Rejected</p>
                                         @endif
                                         @if($job->status == 'Completed')
                                             <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Claim Completed!</p>
@@ -153,6 +160,34 @@
                                             <textarea type="text" id="reason" name="reason"
                                                       class="md-textarea form-control" rows="4" required></textarea>
                                         </div>
+                                        <div class="md-form">
+                                            <i class="fas fa-pencil prefix grey-text"></i>
+                                            <p>Reschedule Date</p>
+                                            <input type="datetime-local" id="sDate" name="sDate" placeholder="Select date" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer d-flex justify-content-center">
+                                        <button class="btn btn-brand">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="modalContactForm3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header text-center">
+                                    <h5 class="modal-title w-100 font-weight-bold">Customer Was Not Home<br><span style="font-weight: 500!important">Reschedule Claim</span></h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form method="post" action="{{url("/customer/not/home/reschedule/claim")}}" enctype="multipart/form-data">
+                                    {{csrf_field()}}
+                                    <input type="hidden" id="jobId" name="jobId" value="{{$job->id}}">
+                                    <div class="modal-body mx-3">
                                         <div class="md-form">
                                             <i class="fas fa-pencil prefix grey-text"></i>
                                             <p>Reschedule Date</p>

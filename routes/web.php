@@ -64,4 +64,11 @@ Route::post('followup/reason', 'JobsController@followUpReasonStore');
 Route::post('reschedule/claim', 'JobsController@rescheduleClaim');
 Route::post('give-rating', 'JobsController@giveRating');
 Route::get('reviews', 'ReviewController@getView');
+Route::post('job/invoice/save', 'JobsController@saveInvoice');
+Route::get('invoices', 'InvoiceController@getView');
+Route::post('job/invoice/status/change', 'InvoiceController@updateInvoice');
+Route::get('invoice/new', 'InvoiceController@newInvoiceView');
+Route::post('new/invoice/save', 'InvoiceController@saveNewInvoice');
+Route::post('customer/not/home/reschedule/claim', 'JobsController@rescheduleClaimNotHome');
+
 
