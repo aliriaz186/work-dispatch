@@ -10,33 +10,33 @@
 
                 <div class="col-xl-12 order-lg-12 order-xl-12">
                     <div class="kt-portlet kt-portlet--mobile">
-                        <div class="kt-portlet__head kt-portlet__head--lg" style="padding: 20px;">
+                        <div class="kt-portlet__head kt-portlet__head--lg" style="padding: 20px;background-color: lightblue">
                             <div class="kt-portlet__head-label col-lg-12">
                                 <div class="col-lg-12">
                                     <div>
-                                        <h1 style="font-weight: 500;font-size: 20px;text-align: center;"
+                                        <h1 style="font-weight: 500;font-size: 20px;text-align: center;color: white!Important"
                                             class="kt-portlet__head-title text-uppercase">
                                             Welcome {{$customer->name}}
                                         </h1>
                                     </div>
                                     <div class="row" style="padding-top: 12px;">
                                         <div class="col-lg-4">
-                                            <h3 class="kt-portlet__head-title text-uppercase" style="font-size: 14px;">
+                                            <h3 class="kt-portlet__head-title text-uppercase" style="font-size: 14px;color: white">
                                              <span class="kt-portlet__head-icon">
-                                            <i class="kt-font-brand fas fa-briefcase"></i>
+                                            <i style="color: white!important;" class="kt-font-brand fas fa-briefcase"></i>
                                         </span>
                                                 {{$job->title}}
                                             </h3>
                                         </div>
                                         <div class="col-lg-4" style="text-align: center">
                                             <h3 class="kt-portlet__head-title text-uppercase mt-1"
-                                                style="font-size: 14px;">
+                                                style="font-size: 14px;color: white!important">
                                                 Claim No: {{$job->id}}
                                             </h3>
                                         </div>
                                         <div class="col-lg-4" style="text-align: center">
                                             <h3 class="kt-portlet__head-title text-uppercase mt-1"
-                                                style="font-size: 14px;">
+                                                style="font-size: 14px;color: white">
                                                 Status: {{$job->status}}
                                             </h3>
                                         </div>
@@ -117,6 +117,10 @@
                                                         Your claim has been rejected
                                                     </p>
                                                 </div>
+                                                <div>
+                                                    <p><span style="font-weight: bold;font-size: 15px;text-decoration: underline;">Service Provider Rejection Message:</span></p>
+                                                    <p> {{\App\RejectClaimReason::where('job_id', $job->id)->first()['customer_message']}}</p>
+                                                </div>
                                             @endif
 {{--                                            <div class="row">--}}
 {{--                                                @if($job->status == "scheduled" || $job->status == "On My Way" || $job->status == "Job Started" || $job->status == "Completed")--}}
@@ -143,13 +147,15 @@
                                                     <h3 class="kt-portlet__head-title text-uppercase">
                                                         <i class="fas fa-check-circle"
                                                            style="color: green; font-size: 18px"></i> Claim has been
-                                                        Scheduled and Assigned to technician
+                                                        Scheduled and Your Technician has been <br> Scheduled on {{$schedule->date}} between
+                                                        ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})
                                                     </h3>
                                                 @else
                                                     <h3 class="kt-portlet__head-title text-uppercase">
                                                         <i class="fas fa-check-circle"
                                                            style="color: grey; font-size: 18px"></i> Claim has been
-                                                        Scheduled and Assigned to technician
+                                                        Scheduled and Your Technician has been <br> Scheduled on {{$schedule->date}} between
+                                                        ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})
                                                     </h3>
                                                 @endif
                                                 <div class="row">
@@ -164,19 +170,41 @@
                                                             |
                                                         </div>
                                                     @endif
-                                                    <p style="padding-left: 20px; margin-top: 20px">
-                                                        Your claim has been scheduled on {{$schedule->date}} between
-                                                        ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})<br>
-                                                        Company Name : {{$technician->company_name}}<br>
-                                                        Technician : {{$worker->name}} (<a href="tel:{{$worker->phone}}">{{$worker->phone}}</a>)
-                                                        <a style="text-decoration: underline" href="tel:{{$worker->phone}}">Call Technician</a>
-                                                        <a style="text-decoration: underline" href="sms:{{$worker->phone}}">Send SMS</a>
-                                                    </p>
+                                                        @if(\App\ClaimRescheduleNotHome::where('job_id', $job->id)->exists())
+                                                            <p style="padding-left: 20px; margin-top: 20px">
+                                                                We missed you, and will try you again
+                                                                on {{$schedule->date}} between
+                                                                ({{$schedule->est_time_from}}
+                                                                - {{$schedule->est_time_to}})<br>
+                                                                Company Name : {{$technician->company_name}}<br>
+                                                                Technician : {{$worker->name}} (<a
+                                                                    href="tel:{{$worker->phone}}">{{$worker->phone}}</a>)
+                                                                <a style="text-decoration: underline"
+                                                                   href="tel:{{$worker->phone}}">Call Technician</a>
+                                                                <a style="text-decoration: underline"
+                                                                   href="sms:{{$worker->phone}}">Send SMS</a>
+                                                            </p>
+                                                        @else
+                                                            <p style="padding-left: 20px; margin-top: 20px">
+                                                                Your claim has been scheduled on {{$schedule->date}}
+                                                                between
+                                                                ({{$schedule->est_time_from}}
+                                                                - {{$schedule->est_time_to}})<br>
+                                                                Company Name : {{$technician->company_name}}<br>
+                                                                Technician : {{$worker->name}} (<a
+                                                                    href="tel:{{$worker->phone}}">{{$worker->phone}}</a>)
+                                                                <a style="text-decoration: underline"
+                                                                   href="tel:{{$worker->phone}}">Call Technician</a>
+                                                                <a style="text-decoration: underline"
+                                                                   href="sms:{{$worker->phone}}">Send SMS</a>
+                                                            </p>
+                                                        @endif
                                                 </div>
                                             @else
                                                 <h3 class="kt-portlet__head-title text-uppercase">
                                                     <i class="fas fa-check-circle"
-                                                       style="color: grey; font-size: 18px"></i> Claim has been Scheduled and Assigned to technician
+                                                       style="color: grey; font-size: 18px"></i> Claim has been Scheduled and Your Technician has been <br> Scheduled on {{$schedule->date}} between
+                                                    ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})
                                                 </h3>
                                                 <div class="row">
                                                     <div
@@ -190,7 +218,7 @@
                                             @endif
                                         </li>
                                         <li class="completed" style="text-decoration: none!important;">
-                                            @if($job->status == "On My Way" || $job->status == "Job Started" || $job->status == "Completed" || $job->status == "Follow Up" || $job->status == "Denied")
+                                            @if($job->status == "On My Way" || $job->status == "Job Started" || $job->status == "Completed" || $job->status == "Follow Up")
                                                 <h3 class="kt-portlet__head-title text-uppercase">
                                                     <i class="fas fa-check-circle"
                                                        style="color: green; font-size: 18px"></i> Technician is on its way
@@ -228,7 +256,7 @@
                                             @endif
                                         </li>
                                         <li class="completed" style="text-decoration: none!important;">
-                                            @if($job->status == "Job Started" || $job->status == "Completed" || $job->status == "Follow Up" || $job->status == "Denied")
+                                            @if($job->status == "Job Started" || $job->status == "Completed" || $job->status == "Follow Up")
 
                                                 <h3 class="kt-portlet__head-title text-uppercase">
                                                     <i class="fas fa-check-circle"
@@ -284,11 +312,12 @@
                                             @endif
                                         </li>
                                         <li class="completed" style="text-decoration: none!important;">
-                                            @if($job->status == "Denied")
+                                            @if($job->status == "rejected")
                                                 <h4 class="ml-5">Status</h4>
                                                 <h3 class="kt-portlet__head-title text-uppercase">
                                                     -- Claim Denied --
                                                 </h3>
+                                                <a target="_blank" href="{{env('ADMIN_URL')}}/jobs/{{$job->id}}/details" style="text-decoration: underline;cursor: pointer">Click here for more Info</a>
                                             @endif
                                         </li>
                                     @if($job->status == "Completed")
@@ -342,12 +371,12 @@
                         </div>
 
                         <div class="kt-portlet kt-portlet--mobile">
-                            <div class="kt-portlet__head kt-portlet__head--lg">
+                            <div class="kt-portlet__head kt-portlet__head--lg" style="background-color: lightblue">
                                 <div class="kt-portlet__head-label">
                                 <span class="kt-portlet__head-icon">
-                                    <i class="kt-font-brand fas fa-briefcase"></i>
+                                    <i style="color: white!important" class="kt-font-brand fas fa-briefcase"></i>
                                 </span>
-                                    <h3 class="kt-portlet__head-title text-uppercase">
+                                    <h3 class="kt-portlet__head-title text-uppercase" style="color: white">
                                         Claim Location ({{$job->job_address}})
                                     </h3>
                                 </div>

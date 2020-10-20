@@ -85,7 +85,6 @@
                 <div class="kt-aside__brand-logo">
                     <a href="#">
                         <h3 style="color: white!important;font-size: 18px;">Priority Home Warranty</h3>
-{{--                        <img alt="Logo" src="{{asset('media/logos/logo-light.png')}}"/>--}}
                     </a>
                 </div>
             </div>
@@ -120,13 +119,14 @@
                             aria-haspopup="true"><a href="{{env('APP_URL')}}/profile" class="kt-menu__link "><span
                                     class="kt-menu__link-icon"><i class="fas fa-user-tie"></i></span><span
                                     class="kt-menu__link-text">Profile</span></a></li>
+                        <li class="kt-menu__item {{ (Request::segment(1) == 'invoices') ? 'kt-menu__item--active' : '' }}"
+                            aria-haspopup="true"><a href="{{env('APP_URL')}}/invoices" class="kt-menu__link "><span
+                                    class="kt-menu__link-icon"><i class="fas fa-file-invoice"></i></span><span
+                                    class="kt-menu__link-text">Invoices</span></a></li>
                         <li class="kt-menu__item {{ (Request::segment(1) == 'reviews') ? 'kt-menu__item--active' : '' }}"
                             aria-haspopup="true"><a href="{{env('APP_URL')}}/reviews" class="kt-menu__link "><span
                                     class="kt-menu__link-icon"><i class="fas fa-star-half-alt"></i></span><span
                                     class="kt-menu__link-text">Reviews</span></a></li>
-{{--                        <li class="kt-menu__item " aria-haspopup="true"><a href="" class="kt-menu__link "><span--}}
-{{--                                    class="kt-menu__link-icon"><i class="far fa-chart-bar"></i></span><span--}}
-{{--                                    class="kt-menu__link-text">Reports</span></a></li>--}}
                     </ul>
                 </div>
             </div>
