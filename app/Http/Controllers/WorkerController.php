@@ -176,7 +176,7 @@ class WorkerController extends Controller
             $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
             $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
             $result = $sendEmail->send($emailMessage);
-//            $this->sendMessage($customerphone, $textEmailBody);
+            $this->sendMessage($customerphone, $textEmailBody);
             return json_encode(['status' => $result]);
         } catch (\Exception $exception) {
             return json_encode(['status' => false, 'message' => 'There is error on server side. Please try again!']);

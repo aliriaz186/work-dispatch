@@ -100,7 +100,7 @@ class JobsController extends Controller
             $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
             $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
             $result = $sendEmail->send($emailMessage);
-//            $this->sendMessage($customerPhone, $textEmailBody);
+            $this->sendMessage($customerPhone, $textEmailBody);
 
 
 
@@ -115,7 +115,7 @@ class JobsController extends Controller
             $emailMessage = new EmailMessage($subject->getEmailSubject(), $mailTo, $body);
             $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
             $result = $sendEmail->send($emailMessage);
-//            $this->sendMessage($workerPhone, $textEmailBody);
+            $this->sendMessage($workerPhone, $textEmailBody);
             return json_encode(['status' => $result]);
         }catch (\Exception $exception){
             return json_encode(['status' => false, 'message' => $exception->getMessage()]);
