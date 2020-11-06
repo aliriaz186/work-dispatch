@@ -58,7 +58,7 @@
                                         @if($job->status == 'Job Started')
                                             <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">Claim Started!</p>
                                             <p>Change status</p>
-                                            <button class="btn btn-brand" data-toggle="modal" data-target="#modalContactForm3">Complete Claim</button>
+                                            <button class="btn btn-brand" data-toggle="modal" data-target="#modalContactForm4">Complete Claim</button>
                                             <button class="btn btn-primary" style="background-color: #0780b7;border-color: #0780b7;color: white;" data-toggle="modal" data-target="#modalContactForm">Needs Follow Up</button>
                                             <button class="btn btn-primary" style="background-color: #0780b7;border-color: #0780b7;color: white;" data-toggle="modal" data-target="#modalContactForm2">Need Reschedule</button>
                                         @endif
@@ -203,7 +203,7 @@
                     </div>
 
                     <!-- Model -->
-                    <div class="modal fade" id="modalContactForm3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                    <div class="modal fade" id="modalContactForm4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
                          aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">

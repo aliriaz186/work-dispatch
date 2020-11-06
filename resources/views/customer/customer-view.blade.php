@@ -203,8 +203,8 @@
                                             @else
                                                 <h3 class="kt-portlet__head-title text-uppercase">
                                                     <i class="fas fa-check-circle"
-                                                       style="color: grey; font-size: 18px"></i> Claim has been Scheduled and Your Technician has been <br> Scheduled on {{$schedule->date}} between
-                                                    ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})
+                                                       style="color: grey; font-size: 18px"></i> Claim has been Scheduled and Your Technician has been <br> Scheduled on {{$schedule->date ?? ''}} between
+                                                    ({{$schedule->est_time_from ?? ''}} - {{$schedule->est_time_to ?? ''}})
                                                 </h3>
                                                 <div class="row">
                                                     <div
