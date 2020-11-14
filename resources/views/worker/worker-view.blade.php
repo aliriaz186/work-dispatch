@@ -39,18 +39,16 @@
                                         <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">{{$job->status}}</p>
                                         @if(\App\ClaimRescheduleNotHome::where('job_id', $job->id)->exists())
                                             <p>We missed you, and will try you again on {{$schedule->date}} between
-                                                ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})</p>
+                                                ({{date("h:i A", strtotime($schedule->est_time_from)) ?? ''}} - {{date("h:i A", strtotime($schedule->est_time_to)) ?? ''}})</p>
                                         @else
-                                            <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}}
-                                                - {{$schedule->est_time_to}})</p>
+                                            <p>Schedule on {{$schedule->date}} between ({{date("h:i A", strtotime($schedule->est_time_from)) ?? ''}} - {{date("h:i A", strtotime($schedule->est_time_to)) ?? ''}})</p>
                                         @endif
                                         <p>Change status</p>
                                         <button class="btn btn-brand" onclick="onMyWay()">On my Way</button>
                                     @endif
                                         @if($job->status == 'On My Way')
                                             <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 100px;text-align: center">You are on your way!</p>
-                                            <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}}
-                                                - {{$schedule->est_time_to}})</p>
+                                            <p>Schedule on {{$schedule->date}} between ({{date("h:i A", strtotime($schedule->est_time_from)) ?? ''}} - {{date("h:i A", strtotime($schedule->est_time_to)) ?? ''}})</p>
                                             <p>Change status</p>
                                             <button class="btn btn-brand" onclick="startJob()">Start Claim</button>
                                             <button class="btn btn-brand" style="background-color: #0780b7!important;border-color: #0780b7!important" data-toggle="modal" data-target="#modalContactForm3">Customer Was Not Home</button>
@@ -346,9 +344,16 @@
                         <div class="kt-portlet__body">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <p><span style="font-weight: 500">First:</span> {{$job->customer_availability_one}} </p>
-                                    <p><span style="font-weight: 500">Second:</span> {{$job->customer_availability_two}} </p>
-                                    <p><span style="font-weight: 500">Third:</span> {{$job->customer_availability_three}} </p>
+                                    <p><span style="font-weight: 500">First:</span>
+                                        @if(!empty($job->customer_availability_one))
+                                            {{date('Y-m-d h:i A', strtotime($job->customer_availability_one)) ?? ''}}
+                                        @endif
+                                    </p>
+                                    <p><span style="font-weight: 500">Second:</span>
+                                        @if(!empty($job->customer_availability_two))
+                                            {{date('Y-m-d h:i A', strtotime($job->customer_availability_two)) ?? ''}}
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         </div>

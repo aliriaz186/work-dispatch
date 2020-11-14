@@ -117,8 +117,8 @@
                                                 <p>We missed you, and will try you again on {{$schedule->date}} between
                                                     ({{$schedule->est_time_from}} - {{$schedule->est_time_to}})</p>
                                             @else
-                                                <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}}
-                                                    - {{$schedule->est_time_to}})</p>
+                                                <p>Schedule on {{$schedule->date}} between ({{date("h:i A", strtotime($schedule->est_time_from)) ?? ''}}
+                                                    - {{date("h:i A", strtotime($schedule->est_time_to)) ?? ''}})</p>
                                             @endif
                                             <p>Technician : {{$workerName}}</p>
                                         @endif
@@ -154,8 +154,8 @@
                                         @if($job->status == 'On My Way')
                                             <p style="color: green; padding: 5px; border-radius: 10px; border: 1px solid green; width: 150px;text-align: center">
                                                 Technician is on his way to Claim location!</p>
-                                            <p>Schedule on {{$schedule->date}} between ({{$schedule->est_time_from}}
-                                                - {{$schedule->est_time_to}})</p>
+                                            <p>Schedule on {{$schedule->date}} between ({{date("h:i A", strtotime($schedule->est_time_from)) ?? ''}}
+                                                - {{date("h:i A", strtotime($schedule->est_time_to)) ?? ''}})</p>
                                             <p>Technician : {{$workerName}}</p>
                                         @endif
                                         @if($job->status == 'Job Started')
@@ -341,7 +341,7 @@
                                     <p><span style="font-weight: 500">City:</span> {{$job->city}} </p>
                                 </div>
                                 <div class="col-lg-12">
-                                    <p><span style="font-weight: 500">Estate:</span> {{$job->estate}} </p>
+                                    <p><span style="font-weight: 500">State:</span> {{$job->estate}} </p>
                                 </div>
                                 <div class="col-lg-12">
                                     <p><span style="font-weight: 500">Zip Code:</span> {{$job->zip_code}} </p>
@@ -428,8 +428,16 @@
                         <div class="kt-portlet__body">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <p><span style="font-weight: 500">First:</span> {{$job->customer_availability_one}} </p>
-                                    <p><span style="font-weight: 500">Second:</span> {{$job->customer_availability_two}} </p>
+                                    <p><span style="font-weight: 500">First:</span>
+                                        @if(!empty($job->customer_availability_one))
+                                        {{date('Y-m-d h:i A', strtotime($job->customer_availability_one)) ?? ''}}
+                                            @endif
+                                    </p>
+                                    <p><span style="font-weight: 500">Second:</span>
+                                        @if(!empty($job->customer_availability_two))
+                                        {{date('Y-m-d h:i A', strtotime($job->customer_availability_two)) ?? ''}}
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         </div>

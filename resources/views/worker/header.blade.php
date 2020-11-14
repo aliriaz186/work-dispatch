@@ -43,9 +43,19 @@
     <!--end::Layout Skins -->
     <link rel="shortcut icon" href=""/>
 </head>
-
+<style>
+    .padding-info-css{
+        padding: 50px;
+        padding-top: 20px;
+    }
+    @media only screen and (max-width: 600px) {
+        .padding-info-css{
+            padding: 5px;
+        }
+    }
+</style>
 <!-- end::Head -->
 
 <!-- begin::Body -->
-<body style="padding: 50px" class="kt-quick-panel--right kt-demo-panel--right kt-offcanvas-panel--right kt-header--fixed kt-header-mobile--fixed kt-subheader--enabled kt-subheader--fixed kt-subheader--solid kt-aside--enabled kt-aside--fixed kt-page--loading">
+<body  class=" padding-info-css kt-quick-panel--right kt-demo-panel--right kt-offcanvas-panel--right kt-header--fixed kt-header-mobile--fixed kt-subheader--enabled kt-subheader--fixed kt-subheader--solid kt-aside--enabled kt-aside--fixed kt-page--loading">
 
