@@ -18,3 +18,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('technicians/get', 'TechnicianController@getTechnicians');
+Route::post('job/invoice/save', 'JobsController@saveInvoice');
