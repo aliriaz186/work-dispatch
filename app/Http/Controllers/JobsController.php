@@ -34,6 +34,9 @@ use services\email_services\SendEmailService;
 class JobsController extends Controller
 {
     public function getView(){
+        if (empty(Session::get('userId'))){
+            return redirect('/');
+        }
         $technician = Technician::where('id', Session::get('userId'))->first();
         $jobs = DispatchJob::where('id_technician', Session::get('userId'))->orderBy('created_at', 'DESC')->get();
         foreach ($jobs as $job){
@@ -101,8 +104,6 @@ class JobsController extends Controller
             $sendEmail = new EmailSender(new PhpMail(new MailConf("smtp.gmail.com", "admin@dispatch.com", "secret-2020")));
             $result = $sendEmail->send($emailMessage);
             $this->sendMessage($customerPhone, $textEmailBody);
-
-
 
             $subject = new SendEmailService(new EmailSubject("Hi, A claim assigned to you in "."   ". env('APP_NAME')));
             $mailTo = new EmailAddress($workerEmail);
